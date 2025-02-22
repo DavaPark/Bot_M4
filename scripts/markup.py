@@ -70,7 +70,7 @@ modules_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text='Як навчатись?')],
         [KeyboardButton(text='Модуль 1️⃣')],
-        [KeyboardButton(text='Назад 🔙')]
+        [KeyboardButton(text='Назад🔙')]
     ],
     resize_keyboard=True
 )
@@ -85,7 +85,7 @@ module_1_menu = ReplyKeyboardMarkup(
         [KeyboardButton(text='Урок 4️⃣')],
         [KeyboardButton(text='Урок 5️⃣')],
         [KeyboardButton(text='Урок 6️⃣')],
-        [KeyboardButton(text='Назад 🔙')]
+        [KeyboardButton(text='Назад  🔙')]
     ],
     resize_keyboard=True
 )

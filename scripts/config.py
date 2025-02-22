@@ -4,7 +4,7 @@ DB_CONFIG = {
     "host": "localhost",
     "user": "root",
     "password": "1234",
-    "db": "test_m4",
+    "db": 'my_bot_db',
 }
 
 
