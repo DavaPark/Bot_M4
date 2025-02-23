@@ -65,58 +65,16 @@ back_buttons_keyboard = ReplyKeyboardMarkup(
 )
 
 
-# Меню модулей
-modules_menu = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text='Як навчатись?')],
-        [KeyboardButton(text='Модуль 1️⃣')],
-        [KeyboardButton(text='Назад🔙')]
-    ],
-    resize_keyboard=True
-)
+def get_module_keyboard(current_module: int) -> ReplyKeyboardMarkup:
+    buttons = [[KeyboardButton(text=f"Модуль {i}")] for i in range(1, current_module + 1)]
+    buttons.append([KeyboardButton(text='Як навчатися?')])
+    buttons.append([KeyboardButton(text="Назад")])  # Кнопка "Назад"
+
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
 
-# Меню уроков (модуль 1)
-module_1_menu = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text='Урок 1️⃣')],
-        [KeyboardButton(text='Урок 2️⃣')],
-        [KeyboardButton(text='Урок 3️⃣')],
-        [KeyboardButton(text='Урок 4️⃣')],
-        [KeyboardButton(text='Урок 5️⃣')],
-        [KeyboardButton(text='Урок 6️⃣')],
-        [KeyboardButton(text='Назад  🔙')]
-    ],
-    resize_keyboard=True
-)
+def get_lesson_keyboard(current_lesson: int) -> ReplyKeyboardMarkup:
+    buttons = [[KeyboardButton(text=f"Урок {i}")] for i in range(1, current_lesson + 1)]
+    buttons.append([KeyboardButton(text="Назад")])  # Кнопка "Назад"
 
-
-# Кнопки внутри уроков
-def lesson_menu():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="Пройти тест ✅")],
-            [KeyboardButton(text="Назад 🔙")]
-        ],
-        resize_keyboard=True
-    )
-
-
-# Кнопки после сдачи теста
-def after_test_menu(passed: bool):
-    if passed:
-        return ReplyKeyboardMarkup(
-            keyboard=[
-                [KeyboardButton(text="Следующий урок ⏭️")],
-                [KeyboardButton(text="Назад 🔙")]
-            ],
-            resize_keyboard=True
-        )
-    else:
-        return ReplyKeyboardMarkup(
-            keyboard=[
-                [KeyboardButton(text="Пересдать тест 🔄")],
-                [KeyboardButton(text="Назад 🔙")]
-            ],
-            resize_keyboard=True
-        )
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)

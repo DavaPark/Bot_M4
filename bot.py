@@ -10,6 +10,7 @@ from aiogram.types import Message, CallbackQuery, FSInputFile
 from scripts.config import TOKEN_API
 from scripts.db_manager import AsyncDB, block_inactive_users
 from datetime import datetime
+from scripts.markup import get_lesson_keyboard
 import scripts.markup as sm
 
 bot = Bot(TOKEN_API)
@@ -165,37 +166,34 @@ async def front_of_menu(callback: CallbackQuery):
 
 @dp.message(F.text == "Навчання 📚")
 async def back_to_main(message: Message):
-    await message.answer('Оберить модуль',
-                         reply_markup=sm.modules_menu)
+    user = await AsyncDB.get_user(message.from_user.id)
+    print(user)
+
+    if not user:
+        await message.answer("Вы не зарегистрированы.")
+        return
+
+    keyboard = sm.get_module_keyboard(getattr(user, "current_module", 1))
+    await message.answer("Выберите модуль:", reply_markup=keyboard)
 
 
-@dp.message(F.text == 'Як навчатись?')
+@dp.message(F.text == 'Як навчатися?')
 async def back_to_main(message: Message):
-    await message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                         reply_markup=sm.back_buttons_keyboard)
-    await message.answer('text')
+
+    await message.answer('text', reply_markup=sm.back_buttons_keyboard)
+    # video_url = 'https://drive.google.com/uc?export=download&id=1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9'
+
+    # await message.answer_video(video_url,)
 
 
-@dp.message(F.text == "Назад 🔙")
-async def back_to_main(message: Message):
-    await message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                         reply_markup=sm.modules_menu)
-
-
-@dp.message(F.text == "Назад🔙")
+@dp.message(F.text == "Назад")
 async def back_to_main(message: Message):
     await message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
                          reply_markup=sm.menu_buttons_keyboard)
 
 
-@dp.message(F.text == "Назад  🔙")
-async def back_to_main(message: Message):
-    await message.answer('Оберить модуль',
-                         reply_markup=sm.modules_menu)
-
-
-@dp.message(F.text == "Модуль 1️⃣")
-async def module_1_handler(message: Message):
+@dp.message(lambda message: message.text.startswith('Модуль'))
+async def handle_module(message: Message):
 
     telegram_id = message.from_user.id
     await AsyncDB.update_current_module(telegram_id, 1)
@@ -207,7 +205,15 @@ async def module_1_handler(message: Message):
         # Обновляем поле module_start_date в базе данных
         await AsyncDB.set_module_start_date(message.from_user.id)
 
-        await message.answer("Выберите действие", reply_markup=sm.module_1_menu)
+        user = await AsyncDB.get_user(message.from_user.id)
+        print(user)
+
+        if not user:
+            await message.answer("Вы не зарегистрированы.")
+            return
+
+        keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+        await message.answer("Выберите урок:", reply_markup=keyboard)
     else:
         await message.answer("Пользователь не найден в базе данных.")
 

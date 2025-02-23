@@ -10,11 +10,17 @@ class AsyncDB:
 
     @staticmethod
     async def get_user(telegram_id: int):
-        async with (await AsyncDB.get_connection()) as conn:
-            async with conn.cursor(aiomysql.DictCursor) as cursor:
-                await cursor.execute("SELECT * FROM users WHERE tel_id=%s", (telegram_id,))
-                result = await cursor.fetchone()
-                return User(**result) if result else None
+        conn = await AsyncDB.get_connection()  # Добавляем await
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute("SELECT * FROM users WHERE tel_id = %s", (telegram_id,))
+            result = await cursor.fetchone()
+
+            if result:
+                result.pop("id", None)  # Убираем id, если есть
+                return User(**result)
+
+        await conn.ensure_closed()  # Закрываем соединение
+        return None
 
     @staticmethod
     async def get_all_users():
