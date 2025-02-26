@@ -1,0 +1,91 @@
+{
+    "lessons": [
+        {
+            "lesson_id": 1,
+            "module_id": 1,
+            "title": "Первый урок",
+            "video": [
+                 {
+                    "video_1": "lesson_1_1_1.mp4"
+                },
+                {
+                    "video_2": "lesson_1_1_2.mp4"
+                },
+                {
+                    "video_3": "lesson_1_1_3.mp4"
+                }
+            ],
+            "test_links": [
+                {
+                    "test_1": "https://docs.google.com/forms/d/1ijH00cbj09ciGPkqV7hRqjO0GRmXl7leohMipWO0luI/edit"
+                },
+                {
+                    "test_2": "https://docs.google.com/forms/d/1Z4II8xtw-wwqKJ_AovDpF8qkadoKkLAyhDUu7COdXLY/edit"
+                },
+                {
+                    "test_3": "https://docs.google.com/forms/d/1o-hhzLMG6U7U2jWzuHVMxXXXaIzcaGivyH9PefMVVz0/edit"
+                }
+            ],
+            "pass_score": 80,
+            "current_video_index": 0,
+            "current_test_index": 1,
+            "current_lesson_progress": 0
+        },
+        {
+            "lesson_id": 2,
+            "module_id": 1,
+            "title": "Урок 2",
+            "video": [
+                {
+                    "video_1": "lesson_1_1_1.mp4"
+                },
+                {
+                    "video_2": "lesson_1_1_2.mp4"
+                },
+                {
+                    "video_3": "lesson_1_1_3.mp4"
+                }
+            ],
+            "test_links": [
+                {
+                    "test_1": "https://docs.google.com/forms/d/1tDDcF5QicB_tgg1vX8IVam_SqIsHXXQBugW18bMCih4/edit"
+                },
+                {
+                    "test_2": "https://docs.google.com/forms/d/11ablWx_N8VOFoR1DRg6nruoGsodBbcm5dWhz9v8IRGg/edit"
+                },
+                {
+                    "test_3": "https://docs.google.com/forms/d/1AB6yFnqDK2fsHJbDfrljB0s0xj_473UxdTj174ZwPYk/edit"
+                }
+            ],
+            "pass_score": 80,
+            "current_video_index": 3,
+            "current_test_index": 2,
+            "current_lesson_progress": 0
+        },
+        {
+            "lesson_id": 3,
+            "module_id": 1,
+            "title": "Урок 3",
+            "video": [
+                {
+                    "video_1": "https://drive.google.com/file/d/1ODrUjuImWNwLqKNlAuGY3ngxb1fesVKI/view?usp=drive_link"
+                },
+                {
+                    "video_2": "https://drive.google.com/file/d/12LcnxoO1CUpN3fgaqm7t-MxphEjIRH94/view?usp=drive_link"
+                }
+            ],
+            "test_links": [
+                {
+                    "test_1": "https://docs.google.com/forms/d/1iUETiHPA68Q_d-8bLLtcQD6NK0N2vJnGDrJLqDjWbfc/edit"
+                },
+                {
+                    "test_2": "https://docs.google.com/forms/d/1iUETiHPA68Q_d-8bLLtcQD6NK0N2vJnGDrJLqDjWbfc/edit"
+                }
+            ],
+            "pass_score": 80,
+            "current_video_index": 2,
+            "current_test_index": 1,
+            "current_lesson_progress": 0
+        }
+    ]
+}

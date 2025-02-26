@@ -15,6 +15,7 @@ class User(models.Model):
     is_admin = models.BooleanField(default=False, choices=USER_TYPE, verbose_name='Тип пользователя')
     create_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     module_start_date = models.DateTimeField(null=True, blank=True, verbose_name='Начало прохождения модуля')
+    current_module = models.IntegerField(default=1, verbose_name='Номер модуля')
     current_lesson = models.IntegerField(default=1, verbose_name='Номер урока')
     last_date = models.DateTimeField(auto_now=True, verbose_name='Прохождение последнего урока')
 

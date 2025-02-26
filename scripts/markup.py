@@ -1,3 +1,7 @@
+from typing import Tuple
+
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton)
 
 
@@ -64,17 +68,68 @@ back_buttons_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+lesson_back_buttons_keyboard = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Вернуться к урокам")]],
+    resize_keyboard=True
+)
+
+module_back_buttons_keyboard = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="🔙Модулі")]],
+    resize_keyboard=True
+)
+
 
 def get_module_keyboard(current_module: int) -> ReplyKeyboardMarkup:
     buttons = [[KeyboardButton(text=f"Модуль {i}")] for i in range(1, current_module + 1)]
     buttons.append([KeyboardButton(text='Як навчатися?')])
-    buttons.append([KeyboardButton(text="Назад")])  # Кнопка "Назад"
+    buttons.append([KeyboardButton(text="Головне меню")])
 
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
 
 
 def get_lesson_keyboard(current_lesson: int) -> ReplyKeyboardMarkup:
     buttons = [[KeyboardButton(text=f"Урок {i}")] for i in range(1, current_lesson + 1)]
-    buttons.append([KeyboardButton(text="Назад")])  # Кнопка "Назад"
+    buttons.append([KeyboardButton(text="🔙Модулі")])
 
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+
+
+# Функция для создания клавиатуры с кнопками для уроков
+def get_lesson_study_keyboard(lesson_title: str, test_link: str, video: str) -> tuple[ReplyKeyboardMarkup, str, str]:
+    buttons = [
+        [KeyboardButton(text=f"Тест ({lesson_title})")],
+        [KeyboardButton(text="Далі")],
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+    # Возвращаем клавиатуру, видео и ссылку на тест
+    return keyboard, video, test_link
+
+
+# Функция для создания кнопок "Тест" и "Далі"
+def get_lesson_more_keyboard(test_url):
+    buttons = [
+        [KeyboardButton(text=f"Тест", url=test_url)],
+        [KeyboardButton(text="Далі")]
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+    return keyboard
+
+
+# Функция для кнопки "Пройти знову"
+def get_retry_keyboard():
+    buttons = [
+        [KeyboardButton(text="Пройти знову")]
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+    return keyboard
+
+
+# Функция для создания клавиатуры с кнопкой "Следующий урок"
+def get_next_lesson_keyboard():
+    buttons = [
+        [KeyboardButton(text="Следующий урок")]
+    ]
+    keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+    return keyboard
+
+
