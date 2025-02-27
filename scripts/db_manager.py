@@ -293,35 +293,35 @@ import aiofiles
 FILE_PATH = 'lessons.json'
 
 
-async def get_lesson_data_json(module_id: int, lesson_id: int):
-    """Получает данные об уроке по его ID и модулю из JSON."""
-    try:
-        async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
-            content = await file.read()
-            data = json.loads(content)
-
-        # Проверяем, есть ли список уроков в данных
-        lessons = data.get("lessons")
-        if not lessons:
-            return None
-
-        # Ищем нужный урок по module_id и lesson_id
-        lesson = next(
-            (
-                lesson
-                for lesson in lessons
-                if lesson.get("module_id") == module_id and lesson.get("lesson_id") == lesson_id
-            ),
-            None,
-        )
-
-        return lesson
-
-    except FileNotFoundError:
-        print(f"Файл {FILE_PATH} не найден.")
-    except json.JSONDecodeError:
-        print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
-    return None
+# async def get_lesson_data_json(module_id: int, lesson_id: int):
+#     """Получает данные об уроке по его ID и модулю из JSON."""
+#     try:
+#         async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
+#             content = await file.read()
+#             data = json.loads(content)
+#
+#         # Проверяем, есть ли список уроков в данных
+#         lessons = data.get("lessons")
+#         if not lessons:
+#             return None
+#
+#         # Ищем нужный урок по module_id и lesson_id
+#         lesson = next(
+#             (
+#                 lesson
+#                 for lesson in lessons
+#                 if lesson.get("module_id") == module_id and lesson.get("lesson_id") == lesson_id
+#             ),
+#             None,
+#         )
+#
+#         return lesson
+#
+#     except FileNotFoundError:
+#         print(f"Файл {FILE_PATH} не найден.")
+#     except json.JSONDecodeError:
+#         print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
+#     return None
 
 
 # Метод для получения текущего индекса видео по module_id и lesson_id
@@ -549,3 +549,85 @@ async def get_videos_by_module_lesson(module_id: int, lesson_id: int):
 #         lesson_data = await get_videos_by_module_lesson(module_number, lesson_number)
 #         await message.answer(f'Вот усі відео {lesson_data}',
 #                              reply_markup=sm.lesson_back_buttons_keyboard)
+
+async def get_lesson_data_json(module_id: int, lesson_id: int):
+    """Получает данные об уроке по его ID и модулю из JSON."""
+    try:
+        async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
+            content = await file.read()
+            data = json.loads(content)
+
+        # Проверяем, есть ли список уроков в данных
+        lessons = data.get("lessons")
+        if not lessons:
+            print("Не найдены уроки в данных JSON.")
+            return None
+
+        # Ищем нужный урок по module_id и lesson_id
+        lesson = next(
+            (
+                lesson
+                for lesson in lessons
+                if lesson.get("module_id") == module_id and lesson.get("lesson_id") == lesson_id
+            ),
+            None,
+        )
+
+        if not lesson:
+            print(f"Урок с module_id={module_id} и lesson_id={lesson_id} не найден.")
+            return None
+
+        return lesson
+
+    except FileNotFoundError:
+        print(f"Файл {FILE_PATH} не найден.")
+    except json.JSONDecodeError:
+        print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
+    return None
+
+
+
+# # Обработчик для кнопки "Далі"
+# @dp.message(lambda message: message.text == 'Далі')
+# async def handle_next_button(message: Message):
+#     tel_id = message.from_user.id
+#     current_module = await AsyncDB.get_user_progress_current_module(tel_id)
+#
+#     # Получаем текущий урок пользователя
+#     current_lesson_data = await AsyncDB.get_user_progress_current_lesson(tel_id)
+#     # Получаем данные урока из JSON
+#     lesson_data = await get_lesson_data_json(current_module, current_lesson_data)
+#
+#     if not current_lesson_data:
+#         await message.answer("Урок не найден.")
+#         return
+#
+#     if not lesson_data:
+#         await message.answer("Урок не найден в базе данных.")
+#         return
+#
+#     # Получаем индекс текущего видео
+#     video_index = lesson_data['current_video_index']
+#
+#     # Проверяем, есть ли следующее видео
+#     if video_index < len(lesson_data['video']):
+#         # Получаем ссылку на следующее видео
+#         video_url = list(lesson_data['video'][video_index].values())[0]  # получаем ссылку на видео
+#         test_index = lesson_data['current_test_index']
+#         if test_index < len(lesson_data['test_links']):
+#             # Получаем ссылку на следующий тест
+#             test_url = list(lesson_data['test_links'][test_index].values())[0]  # получаем ссылку на тест
+#             # Создаем инлайн кнопку для теста
+#             test_button = InlineKeyboardButton(text="Пройти тест", url=test_url)
+#
+#             # Создаем инлайн клавиатуру
+#             lesson_keyboard = InlineKeyboardMarkup(inline_keyboard=[[test_button]])
+#             # Обновляем индекс видео для пользователя
+#             await update_current_video_index(current_module, current_lesson_data, video_index + 1)
+#             await message.answer_video(f"Смотрите видео: {video_url}",
+#                                        reply_markup=lesson_keyboard)
+#         else:
+#             await message.answer('Ви молодці!')
+#     else:
+#         await message.answer("Ви молодці приступайте до наступного уроку",
+#                              reply_markup=sm.get_next_lesson_keyboard())
