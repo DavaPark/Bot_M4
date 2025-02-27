@@ -9,7 +9,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, \
     KeyboardButton, ReplyKeyboardMarkup
-from scripts.config import TOKEN_API
+from scripts.config import TOKEN_API, W4P_KEY, DOMAIN_NAME, MERCHANT_ACCOUNT
 from scripts.db_manager import AsyncDB, block_inactive_users, \
     get_lesson_data_json, update_current_video_index, update_current_test_index, update_current_video_index_0, \
     get_current_video_index, update_current_test_index_0
@@ -17,6 +17,8 @@ from datetime import datetime
 from scripts.markup import get_lesson_keyboard
 
 import scripts.markup as sm
+from scripts.texts import *
+from scripts.way4pay import WayForPay
 
 bot = Bot(TOKEN_API, default=DefaultBotProperties(parse_mode="HTML"))
 dp = Dispatcher()
@@ -176,10 +178,23 @@ async def process_email(message: Message, state: FSMContext):
     await AsyncDB.create_user(
         telegram_id=message.from_user.id,
         name=message.from_user.full_name,
-        email=user_data["email"]
+        email=user_data["email"],
+        username=message.from_user.username
     )
     await AsyncDB.create_user_progress(telegram_id=message.from_user.id)
-    await message.answer('✅ Регистрация завершена!', reply_markup=sm.accept_inline_markup)
+    await bot.send_message(
+        message.chat.id,
+        "🎯 Ти майже на старті! Залишився важливий крок – заповнити анкету. Це обов’язкова умова для реєстрації та доступу до курсу.\n"
+        "\nАнкета допоможе нам краще зрозуміти твої потреби та зробити навчання більш цінним для тебе. А для тебе – це можливість усвідомити свої цілі та отримати максимальну користь\n"
+        "\nЧому це важливо?\n"
+        "\n📝 Чіткіше визначиш свої очікування від курсу.\n"
+        "📊 Ми адаптуємо матеріали під потреби учасників.\n"
+        "🤝 Станеш частиною спільноти однодумців.\n"
+        "\nЩо робити?\n"
+        "\n1️⃣ Заповни анкету – натисни кнопку нижче.\n"
+        "2️⃣ Повернися та натисни 'Я заповнив/ла анкету', щоб перейти до оплати.\n"
+        "\n🚀 Ти готовий? Тоді вперед!\n",
+        reply_markup=sm.form_inline_markup)
     await state.clear()
 
 
@@ -222,17 +237,39 @@ async def go_back_form(callback: CallbackQuery):
                                   reply_markup=sm.accept_inline_markup)
 
 
-@dp.callback_query(F.data == 'pay')
-async def pay(callback: CallbackQuery):
-    await callback.answer()
-    await callback.message.answer_photo(
-        photo='https://www.apple.com/v/apple-pay/u/images/meta/apple_pay__c08w264834sy_og.png?202502121246',
-        caption='Pay',
-        reply_markup=sm.pay_inline_markup)
+@dp.callback_query(F.data == 'check_registration_form')
+async def check_registration_form(callback: CallbackQuery):
+    tel_id = callback.message.chat.id
+    user = await AsyncDB.get_user(tel_id)
+    # await bot.delete_message(tel_id, callback.message.message_id)
+    if user:
+        if user.phone and user.region and user.denomination and user.role:
+            if len(user.phone) != 0 and len(user.region) != 0 and len(user.denomination) != 0 and len(user.role) != 0:
+                payment_number = await AsyncDB.get_user_payments(tel_id)
+                wfp = WayForPay(key=W4P_KEY, domain_name=DOMAIN_NAME)
+                res = wfp.create_invoice(
+                    merchantAccount=MERCHANT_ACCOUNT,
+                    merchantAuthType='SimpleSignature',
+                    amount='500',
+                    currency='UAH',
+                    productNames=["Оплата за курс M4"],
+                    productPrices=[500],
+                    productCounts=[1],
+                    orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 1}"
+                )
+                link = res.invoiceUrl
+                if link is not None:
+                    await bot.send_message(tel_id, pay_text, reply_markup=sm.pay_keyb(link))
+                    return
+
+    await bot.send_message(tel_id, not_registered_yet, reply_markup=sm.form_inline_markup)
+
 
 
 @dp.callback_query(F.data == 'to_pay')
 async def front_of_menu(callback: CallbackQuery):
+
+    # при успешной оплате
     video_id = 'BAACAgIAAxkBAAPFZ8Bu8ajHtoaignWxQ97udddTYCwAAq5hAAJXDAhKFdXY_cFCbyE2BA'
     await callback.answer()
     await callback.message.answer_video(video_id,

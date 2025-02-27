@@ -41,16 +41,16 @@ class AsyncDB:
         return bool(await AsyncDB.get_user(telegram_id))
 
     @staticmethod
-    async def create_user(telegram_id: int, name: str, email: str, context: str = ""):
+    async def create_user(telegram_id: int, name: str, email: str, context: str = "", username=None):
         async with (await AsyncDB.get_connection()) as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
                     """
                     INSERT INTO users 
-                    (tel_id, name, email, context, is_blocked, is_admin, last_date, module_start_date) 
-                    VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+                    (tel_id, name, email, context, is_blocked, is_admin, last_date, module_start_date, username) 
+                    VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW(), %s)
                     """,
-                    (telegram_id, name, email, context, False, False)
+                    (telegram_id, name, email, context, False, False, username)
                 )
                 await conn.commit()
 
@@ -244,6 +244,17 @@ class AsyncDB:
 
                 # Если current_module > module_id или (current_module == module_id и current_lesson > lesson_id)
                 return (current_module > module_id) or (current_module == module_id and current_lesson > lesson_id)
+
+    @staticmethod
+    async def get_user_payments(telegram_id: int):
+        conn = await AsyncDB.get_connection()  # Добавляем await
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(f"SELECT * FROM myapp1_payment WHERE order_reference LIKE 'M4-{telegram_id}-%';")
+            result = await cursor.fetchall()
+            # await conn.ensure_closed()
+            return len(result)
+        await conn.ensure_closed()  # Закрываем соединение
+        return None
 
 
 # Функция для получения данных урока

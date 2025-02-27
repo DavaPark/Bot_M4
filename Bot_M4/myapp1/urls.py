@@ -4,4 +4,5 @@ from .views import *
 
 urlpatterns = [
     path('paymentCallback/', payment_callback, name='paymentCallback'),
+    path('registrationForm/', registrationForm, name='registrationForm'),
 ]

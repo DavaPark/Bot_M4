@@ -6,6 +6,7 @@ USER_TYPE = (('superadmin', 'Суперадминистратор'),
 
 
 class Payment(models.Model):
+    id = models.AutoField(primary_key=True)
     merchant_account = models.CharField(max_length=255, verbose_name="Мерчант акаунт")
     order_reference = models.CharField(max_length=255, unique=True, verbose_name="Номер замовлення")
     merchant_signature = models.CharField(max_length=255, verbose_name="Підпис мерчанта")
@@ -16,29 +17,30 @@ class Payment(models.Model):
     phone = models.CharField(max_length=20, verbose_name="Телефон")
     created_date = models.DateTimeField(verbose_name="Дата створення")
     processing_date = models.DateTimeField(verbose_name="Дата обробки")
-    card_pan = models.CharField(max_length=20, verbose_name="PAN картки")
-    card_type = models.CharField(max_length=50, verbose_name="Тип картки")
-    issuer_bank_country = models.CharField(max_length=100, verbose_name="Країна банку-емітента")
-    issuer_bank_name = models.CharField(max_length=255, verbose_name="Назва банку-емітента")
+    card_pan = models.CharField(max_length=20, blank=True, null=True, verbose_name="PAN картки")
+    card_type = models.CharField(max_length=50, blank=True, null=True, verbose_name="Тип картки")
+    issuer_bank_country = models.CharField(max_length=100, blank=True, null=True, verbose_name="Країна банку-емітента")
+    issuer_bank_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Назва банку-емітента")
     rec_token = models.CharField(max_length=255, blank=True, null=True, verbose_name="Токен рекурентного платежу")
     transaction_status = models.CharField(max_length=50, verbose_name="Статус транзакції")
-    reason = models.CharField(max_length=255, verbose_name="Причина відмови")
-    reason_code = models.IntegerField(verbose_name="Код причини відмови")
-    fee = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Комісія")
-    payment_system = models.CharField(max_length=50, verbose_name="Платіжна система")
-    acquirer_bank_name = models.CharField(max_length=255, verbose_name="Банк-еквайєр")
-    card_product = models.CharField(max_length=50, verbose_name="Продукт картки")
-    client_name = models.CharField(max_length=255, verbose_name="Ім'я клієнта")
-    repay_url = models.URLField(verbose_name="URL повторного платежу")
+    reason = models.CharField(max_length=255, blank=True, null=True, verbose_name="Причина відмови")
+    reason_code = models.IntegerField(blank=True, null=True, verbose_name="Код причини відмови")
+    fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Комісія")
+    payment_system = models.CharField(max_length=50, blank=True, null=True, verbose_name="Платіжна система")
+    acquirer_bank_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Банк-еквайєр")
+    card_product = models.CharField(max_length=50, blank=True, null=True, verbose_name="Продукт картки")
+    client_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Ім'я клієнта")
+    repay_url = models.URLField(blank=True, null=True, verbose_name="URL повторного платежу")
     rrn = models.CharField(max_length=255, blank=True, null=True, verbose_name="RRN")
-    terminal = models.CharField(max_length=255, verbose_name="Термінал")
-    acquirer = models.CharField(max_length=255, verbose_name="Еквайєр")
-    product_name = models.CharField(max_length=255, verbose_name="Назва товару")
-    product_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ціна товару")
-    product_count = models.IntegerField(verbose_name="Кількість товару")
+    terminal = models.CharField(max_length=255, blank=True, null=True, verbose_name="Термінал")
+    acquirer = models.CharField(max_length=255, blank=True, null=True, verbose_name="Еквайєр")
+    product_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Назва товару")
+    product_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Ціна товару")
+    product_count = models.IntegerField(blank=True, null=True, verbose_name="Кількість товару")
 
     def __str__(self):
-        return f"Payment {self.order_reference} - {self.transaction_status}"
+        return f"Платіж {self.order_reference} - {self.transaction_status}"
+
 
     @classmethod
     def update_or_create_from_request(cls, data):
@@ -83,28 +85,32 @@ class Payment(models.Model):
         return obj
 
 
+class User(models.Model):
+    tel_id = models.BigIntegerField(unique=True, verbose_name="Telegram ID")
+    name = models.CharField(max_length=255, verbose_name="Ім'я")
+    email = models.CharField(max_length=255, verbose_name="Email")
+    username = models.CharField(max_length=255, verbose_name="Username")
+    context = models.TextField(blank=True, null=True, verbose_name="Контекст")
+    is_blocked = models.BooleanField(default=False, verbose_name="Заблокований")
+    is_admin = models.BooleanField(default=False, verbose_name="Адміністратор")
+    create_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата створення")
+    module_start_date = models.DateTimeField(blank=True, null=True, verbose_name="Дата початку модуля")
+    current_lesson = models.IntegerField(blank=True, null=True, verbose_name="Поточний урок")
+    last_date = models.DateTimeField(blank=True, null=True, verbose_name="Остання активність")
+    current_module = models.IntegerField(blank=True, null=True, verbose_name="Поточний модуль")
+    phone = models.CharField(max_length=255, blank=True, null=True, verbose_name="Телефон")
+    region = models.CharField(max_length=255, blank=True, null=True, verbose_name="Область")
+    denomination = models.CharField(max_length=255, blank=True, null=True, verbose_name="Деномінація")
+    role = models.CharField(max_length=255, blank=True, null=True, verbose_name="Роль у служінні")
 
-# class User(models.Model):
-#     id = models.IntegerField(primary_key=True, verbose_name='ID записи')
-#     tel_id = models.BigIntegerField(unique=True, verbose_name='Telegram ID пользователя')
-#     name = models.CharField(max_length=255, verbose_name='Имя')
-#     email = models.EmailField(unique=True, verbose_name='Email')
-#     context = models.TextField(blank=False, verbose_name='Контекст')
-#     is_blocked = models.BooleanField(default=False, choices=STATUSES, verbose_name='Статус')
-#     is_admin = models.BooleanField(default=False, choices=USER_TYPE, verbose_name='Тип пользователя')
-#     create_date = models.DateTimeField(verbose_name='Дата создания')
-#     module_start_date = models.DateTimeField(null=True, blank=True, verbose_name='Начало прохождения модуля')
-#     current_module = models.IntegerField(default=1, verbose_name='Номер модуля')
-#     current_lesson = models.IntegerField(default=1, verbose_name='Номер урока')
-#     last_date = models.DateTimeField(verbose_name='Прохождение последнего урока')
-#
-#     class Meta:
-#         verbose_name = 'Пользователи'
-#         verbose_name_plural = 'Пользователи'
-#         db_table = 'users'
-#         managed = False
-#
-#
+    class Meta:
+        verbose_name = "Користувач"
+        verbose_name_plural = "Користувачі"
+        db_table = 'users'
+
+    def __str__(self):
+        return self.name
+
 # class Archive(models.Model):
 #     id = models.IntegerField(primary_key=True, verbose_name='ID записи')
 #     tel_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Telegram ID пользователя')

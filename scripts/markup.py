@@ -19,7 +19,7 @@ main_regicter_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
 register_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='📜Прочитати умови', url='https://telegra.ph/Publ%D1%96chna-oferta-na-koristuvannya-poslugami-chat-bota-z-navchalnimi-kursami-02-27')],
     [InlineKeyboardButton(text='✅Прийняти умови', callback_data='accept')],
-    [InlineKeyboardButton(text='Назад 🔙', callback_data='go_back_register')]
+    # [InlineKeyboardButton(text='Назад 🔙', callback_data='go_back_register')]
 
 ])
 
@@ -37,8 +37,8 @@ accept_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
 
 form_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Google Forms', url='https://docs.google.com/forms/d/1rKxzZN1LuU7Q6H_vHlocf2CV9dZgK_OVqZH2sBX7HrA/edit')],
-    [InlineKeyboardButton(text='✅Я заповнив/ла анкету', callback_data='pay')],
-    [InlineKeyboardButton(text='Назад 🔙', callback_data='go_back_form')]
+    [InlineKeyboardButton(text='✅ Я заповнив/ла анкету', callback_data='check_registration_form')],
+    # [InlineKeyboardButton(text='Назад 🔙', callback_data='go_back_form')]
 ])
 
 
@@ -48,9 +48,10 @@ program_go_back_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
 ])
 
 
-pay_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='💳Сплатити', callback_data='to_pay')]
-])
+def pay_keyb(link):
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text='💳 Оплатити', url=link)]
+    ])
 
 
 menu_buttons_keyboard = ReplyKeyboardMarkup(

@@ -177,21 +177,3 @@ class WayForPay:
 			print(f'Error: {e}')
 			return None
 
-
-# key = 'flk3409refn54t54t*FNJRET'
-# domain_name = 'https://m4ready.org/ukraine/'
-# merchantAccount = 'test_merch_n1'
-#
-# wfp = WayForPay(key=key, domain_name=domain_name)
-# res = wfp.create_invoice(
-# 	merchantAccount=merchantAccount,
-# 	merchantAuthType='SimpleSignature',
-# 	amount='1',
-# 	currency='UAH',
-# 	productNames=["Оплата за курс M4"],
-# 	productPrices=[1],
-# 	productCounts=[1],
-# 	orderID="M4-420404892-3"
-# )
-# print(res.invoiceUrl)
-# print(res.json())
