@@ -2,22 +2,23 @@ import asyncio
 import logging
 import re
 
-from aiogram import Bot, Dispatcher, F, types
+from aiogram.client.default import DefaultBotProperties
+from aiogram import Bot, Dispatcher, F
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import Message, CallbackQuery, FSInputFile, InlineKeyboardButton, InlineKeyboardMarkup, \
-    KeyboardButton, ReplyKeyboardMarkup, InputFile
+from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, \
+    KeyboardButton, ReplyKeyboardMarkup
 from scripts.config import TOKEN_API
 from scripts.db_manager import AsyncDB, block_inactive_users, \
     get_lesson_data_json, update_current_video_index, update_current_test_index, update_current_video_index_0, \
-    get_videos_by_module_lesson
+    get_current_video_index, update_current_test_index_0
 from datetime import datetime
 from scripts.markup import get_lesson_keyboard
 
 import scripts.markup as sm
 
-bot = Bot(TOKEN_API)
+bot = Bot(TOKEN_API, default=DefaultBotProperties(parse_mode="HTML"))
 dp = Dispatcher()
 
 
@@ -26,64 +27,117 @@ async def cmd_start(message: Message):
     await AsyncDB.update_user(message.from_user.id, last_date=datetime.now().date())
     existing_user = await AsyncDB.get_user_by_telegram_id(message.from_user.id)
     if existing_user:
-        await message.answer('✅ C Возвращением!')
-        await message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                             reply_markup=sm.menu_buttons_keyboard)
+        video_id = 'BAACAgIAAxkBAAPFZ8Bu8ajHtoaignWxQ97udddTYCwAAq5hAAJXDAhKFdXY_cFCbyE2BA'
+        await message.answer_video(video_id,
+                                   reply_markup=sm.menu_buttons_keyboard)
     else:
-        video_path = r"D:\PythonProjects\video_2025-02-17_14-08-40.mp4"
-        video = FSInputFile(video_path)
-        await message.answer_video(video)
-        await message.answer(f'Hello {message.from_user.first_name}', reply_markup=sm.main_regicter_inline_markup)
+
+        video_id = "BAACAgIAAxkBAAMDZ8BKn5Cuc8QAAb0ce2k7QJdqiP9aAAKlcgACVwwAAUpvyyB6gghfJjYE"
+        await message.answer_video(video_id)
+        await message.answer("👋 Привіт! Раді, що ти тут! Якщо ти дивишся це відео, значить, прагнеш зрозуміти свій поклик. І це чудово! 🎯"
+                             "М4 Інтенсив – це 90 днів практичного навчання, що допоможе тобі знайти своє місце в служінні. Ми підтримаємо тебе на цьому шляху та дамо інструменти для впевненого старту. "
+                             "Як почати?"
+                             "🔹 Щоб впевнитися, що це для тебе – переглянь інформацію під відео: про нас, програму курсу, відгуки учасників. Досліджуй та приймай рішення! "
+                             "🔹 Готовий зробити крок? Натискай 'Зареєструватися', заповнюй форму та ставай частиною нашої спільноти! 🚀",
+                             reply_markup=sm.main_regicter_inline_markup)
 
 
 @dp.callback_query(F.data == 'program')
 async def program(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view')
-    await callback.message.answer_photo(photo='https://ionity.ua/wp-content/uploads/2025/01/m4-cs.jpg.jpg')
-    await callback.message.answer('text', reply_markup=sm.program_go_back_inline_markup)
+    video_id = "BAACAgIAAxkBAANWZ8BbIwP5xhYxSdZo52GR4QVaj6MAAsdzAAJXDAABStl7xdfRNRl-NgQ"
+    await callback.message.answer_video(video_id)
+    await callback.message.answer_photo(photo='AgACAgIAAxkBAANaZ8BbkqdO-1QYenBcyDJ3RqdnzrwAAkDmMRtApwABSsqe1imkYgvmAQADAgADeQADNgQ')
+    await callback.message.answer("\n<b>Що ти отримаєш під час навчання?</b>\n"
+                                  "M4 Ready – це 90-денний інтерактивний онлайн-курс у Telegram, який допоможе тобі зрозуміти, чи кличе тебе Бог до заснування церкви, та дасть чіткий план подальших кроків у служінні.\n"
+                                  "\n<b>🔹 Що включає навчання?</b>\n"
+                                  "✅ <b>6 ключових модулів</b> – усе, що потрібно для розвитку лідерства, команди та бачення церкви.\n"
+                                  "✅ <b>Практичні відеоуроки</b> – стисла, структурована інформація без води.\n"
+                                  "✅ <b>Інтерактивні завдання</b> – не просто слухай, а застосовуй знання в реальних ситуаціях.\n"
+                                  "✅ <b>Онлайн-спільнота</b> – підтримка та натхнення від інших учасників курсу.\n"
+                                  "✅ <b>Регіональні зустрічі</b> – живе спілкування, обмін досвідом і натхнення.\n"
+                                  "✅ <b>Гнучкий формат</b> – навчайся в зручному ритмі, коли тобі комфортно.\n"
+                                  "✅ <b>Конкретний план дій</b> – отримаєш зрозумілий алгоритм створення та розвитку громади.\n"
+                                  "✅ <b>Досвід практиків</b> – навчання від лідерів, які вже заснували церкви.\n"
+                                  "✅ <b>Фокус на результат</b> – лише те, що дійсно працює у сучасному служінні.\n"
+                                  "\n🎯 <b>Для кого цей курс?</b>\n"
+                                  "\n <b>-</b> Для тих, хто хоче зрозуміти, чи кличе їх Бог до заснування церкви.\n"
+                                  "<b>-</b> Для молодих лідерів, які шукають своє місце в служінні.\n"
+                                  "<b>-</b> Для тих, хто прагне навчитись ефективно вести команду та будувати громаду.\n"
+                                  "\n📌<b> Якщо ти шукаєш ясність у покликанні та чіткі кроки для служіння – цей курс для тебе!</b>\n"
+                                  "\nНатискай 'Реєстрація' та приєднуйся до навчання🚀",
+                                  reply_markup=sm.program_go_back_inline_markup)
 
 
 @dp.callback_query(F.data == 'program_go_back')
 async def program_go_back(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                                  caption='text',
+    video_id = "BAACAgIAAxkBAAMDZ8BKn5Cuc8QAAb0ce2k7QJdqiP9aAAKlcgACVwwAAUpvyyB6gghfJjYE"
+    await callback.message.answer_video(video_id)
+    await callback.message.answer("👋 Привіт! Раді, що ти тут! Якщо ти дивишся це відео, значить, прагнеш зрозуміти свій поклик. І це чудово! 🎯"
+                             "М4 Інтенсив – це 90 днів практичного навчання, що допоможе тобі знайти своє місце в служінні. Ми підтримаємо тебе на цьому шляху та дамо інструменти для впевненого старту. "
+                             "Як почати?"
+                             "🔹 Щоб впевнитися, що це для тебе – переглянь інформацію під відео: про нас, програму курсу, відгуки учасників. Досліджуй та приймай рішення! "
+                             "🔹 Готовий зробити крок? Натискай 'Зареєструватися', заповнюй форму та ставай частиною нашої спільноти! 🚀",
                                   reply_markup=sm.main_regicter_inline_markup)
 
 
 @dp.callback_query(F.data == 'why_need')
 async def why_need(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view')
-    await callback.message.answer('text', reply_markup=sm.program_go_back_inline_markup)
+    video_id = 'BAACAgIAAxkBAAOnZ8BnIbfCSg2R5HU4izjpcI-7dzgAAqdhAAJApwABSsDvmC8dOYGgNgQ'
+    await callback.message.answer_video(video_id)
+    await callback.message.answer_photo(photo='AgACAgIAAxkBAAOjZ8BmyzugXiu1u03VDUA7QorTKtgAApjpMRtXDAhKvNirwneIGxUBAAMCAAN5AAM2BA')
+    await callback.message.answer("🚀 <b>Чи кличе тебе Бог до заснування церкви?</b>\n"
+                                  "\nТи відчуваєш, що Бог може кликати тебе до більшого, але не знаєш, з чого почати? Чи активно ділишся Євангелієм, дбаєш про людей, прагнеш змін у своїй громаді, але не впевнений, чи варто тобі засновувати церкву? <b>M4 Інтенсив</b> – це 90-денний інтерактивний онлайн-курс у Telegram, створений саме для тих, хто шукає відповіді на ці питання та прагне зробити впевнені перші кроки у своєму покликанні.\n"
+                                  "\n🔹 <b>Що ти отримаєш?</b> \n"
+                                  "\n ✅ 6 ключових модулів, що проведуть тебе від розпізнавання покликання до практичного служіння.\n"
+                                  "✅ Лаконічні відеоуроки та інтерактивні завдання для застосування знань у реальному житті.\n"
+                                  "✅ Структурований підхід, що допоможе рухатися вперед у зручному темпі без хаосу та перевантаження.\n"
+                                  "✅ Онлайн-спільнота, де ти знайдеш підтримку, натхнення та відповіді на свої питання.\n"
+                                  "✅ Регіональні зустрічі для знайомства, обміну досвідом та зміцнення у покликанні.\n"
+                                  "\n🎯 <b>Для кого цей курс?</b>\n"
+                                  "\n<b>-</b> Для тих, хто хоче зрозуміти, чи дійсно Бог кличе їх засновувати церкву.\n"
+                                  "<b>-</b> Для молодих лідерів, які шукають своє місце в служінні.\n"
+                                  "<b>-</b> Для тих, хто хоче навчитись вести команду та розвивати здорову церкву.\n"
+                                  "\n 📌 <b>Якщо ти прагнеш знайти чітке бачення свого покликання – ця програма для тебе!</b> Натискай 'Реєстрація' та ставай частиною цього шляху.",
+                                  reply_markup=sm.program_go_back_inline_markup)
 
 
 @dp.callback_query(F.data == 'register')
 async def register(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                                  caption='text',
+    video_id = 'BAACAgIAAxkBAAMKZ8BNTYitzbPryFUzEPINTV2IYkIAAtVyAAJXDAABShI4YflxeikaNgQ'
+    await callback.message.answer_video(video_id,
+                                  caption='🎉 Ти на крок ближче до змін! Зараз важливо визначитися: чи готовий ти інвестувати час у своє покликання?\n'
+                                          '\nЩо потрібно знати?\n'
+                                          '✅ Цінність навчання – 145$, але для українців діє спецпропозиція – 500 грн. Ми встановили мінімальну оплату, щоб долучалися лише ті, хто серйозно налаштований навчатися й застосовувати знання на практиці.'
+                                          '✅ Перед стартом прийми умови – це гарантія якісного навчання.\n'
+                                          '\nЯк приєднатися?\n'
+                                          '\n1️⃣ Прочитай умови – натисни "Прочитати умови".\n'
+                                          '2️⃣ Підтвердь згоду – натисни "Прийняти умови".\n'
+                                          '3️⃣ Заповни форму та залиш e-mail. Маєш питання? Пиши на M4Ukraine@gmail.com.\n'
+                                          '4️⃣ Оплати курс – швидко та безпечно через WayForPay.\n'
+                                          '\n🚀 Якщо ти готовий діяти – почнемо просто зараз!',
                                   reply_markup=sm.register_inline_markup)
 
 
 @dp.callback_query(F.data == 'go_back_register')
 async def go_back_register(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view')
-    await callback.message.answer('text', reply_markup=sm.main_regicter_inline_markup)
-
-
-@dp.callback_query(F.data == "read_conditions")
-async def read_conditions(callback: CallbackQuery):
-    await callback.answer('📌 Условия: \n1️⃣ Вы соглашаетесь с правилами. \n'
-                          '2️⃣ Данные будут обработаны.\n'
-                          '3️⃣ Спам '
-                          'запрещён!',
-                          show_alert=True)
-    await callback.message.answer('Если согласны, нажмите кнопку ниже:',
-                                  reply_markup=sm.register_accept_inline_markup)
-    await callback.answer()
+    video_id = 'BAACAgIAAxkBAAMKZ8BNTYitzbPryFUzEPINTV2IYkIAAtVyAAJXDAABShI4YflxeikaNgQ'
+    await callback.message.answer_video(video_id,
+                                        caption='🎉 Ти на крок ближче до змін! Зараз важливо визначитися: чи готовий ти інвестувати час у своє покликання?\n'
+                                                '\nЩо потрібно знати?\n'
+                                                '✅ Цінність навчання – 145$, але для українців діє спецпропозиція – 500 грн. Ми встановили мінімальну оплату, щоб долучалися лише ті, хто серйозно налаштований навчатися й застосовувати знання на практиці.'
+                                                '✅ Перед стартом прийми умови – це гарантія якісного навчання.\n'
+                                                '\nЯк приєднатися?\n'
+                                                '\n1️⃣ Прочитай умови – натисни "Прочитати умови".\n'
+                                                '2️⃣ Підтвердь згоду – натисни "Прийняти умови".\n'
+                                                '3️⃣ Заповни форму та залиш e-mail. Маєш питання? Пиши на M4Ukraine@gmail.com.\n'
+                                                '4️⃣ Оплати курс – швидко та безпечно через WayForPay.\n'
+                                                '\n🚀 Якщо ти готовий діяти – почнемо просто зараз!',
+                                        reply_markup=sm.main_regicter_inline_markup)
 
 
 class RegisterState(StatesGroup):
@@ -96,14 +150,18 @@ EMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 @dp.callback_query(F.data == 'accept')
 async def accept(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RegisterState.waiting_for_email)
+    await callback.answer()
     existing_user = await AsyncDB.get_user_by_telegram_id(callback.from_user.id)
     if existing_user:
-        await callback.message.answer('✅ Вы уже зарегистрированы! Продолжаем...')
-        await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                                      caption='text',
+        await callback.message.answer('✅ Вы уже зарегистрированы! Продолжаем...',
                                       reply_markup=sm.accept_inline_markup)
     else:
-        await callback.message.answer('Введите ваш email:')
+        await callback.message.answer('🎉 Ти майже готовий розпочати навчання! Щоб отримати доступ, нам потрібен твій e-mail – Telegram дозволяє надсилати матеріали лише зареєстрованим у системі користувачам.\n'
+                                      '\nЩо потрібно зробити?\n'
+                                      '\n✉️ Введи свій e-mail у поле нижче.\n'
+                                      '🔐 Переконайся, що він правильний, щоб не втратити доступ.\n'
+                                      '✅Далі – заповнення форми, після чого зможеш перейти до оплати.\n'
+                                      '\n🚀Все готово? Тоді вперед!')
 
 
 @dp.message(RegisterState.waiting_for_email)
@@ -121,36 +179,46 @@ async def process_email(message: Message, state: FSMContext):
         email=user_data["email"]
     )
     await AsyncDB.create_user_progress(telegram_id=message.from_user.id)
-    await message.answer('✅ Регистрация завершена!')
-
+    await message.answer('✅ Регистрация завершена!', reply_markup=sm.accept_inline_markup)
     await state.clear()
-
-    await message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                         caption='text',
-                         reply_markup=sm.accept_inline_markup)
 
 
 @dp.callback_query(F.data == 'go_back_accept')
 async def register(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                                  caption='text',
+    await callback.message.answer('✅ Вы уже зарегистрированы! Продолжаем...',
                                   reply_markup=sm.register_inline_markup)
 
 
 @dp.callback_query(F.data == 'form')
 async def form(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                                  caption='text',
+    await callback.message.answer("🎯 Ти майже на старті! Залишився важливий крок – заповнити анкету. Це обов’язкова умова для реєстрації та доступу до курсу.\n"
+                                  "\nАнкета допоможе нам краще зрозуміти твої потреби та зробити навчання більш цінним для тебе. А для тебе – це можливість усвідомити свої цілі та отримати максимальну користь\n"
+                                  "\nЧому це важливо?\n"
+                                  "\n📝 Чіткіше визначиш свої очікування від курсу.\n"
+                                  "📊 Ми адаптуємо матеріали під потреби учасників.\n"
+                                  "🤝 Станеш частиною спільноти однодумців.\n"
+                                  "\nЩо робити?\n"
+                                  "\n1️⃣ Заповни анкету – натисни кнопку нижче.\n"
+                                  "2️⃣ Повернися та натисни 'Я заповнив/ла анкету', щоб перейти до оплати.\n"
+                                  "\n🚀 Ти готовий? Тоді вперед!\n",
                                   reply_markup=sm.form_inline_markup)
 
 
 @dp.callback_query(F.data == 'go_back_form')
 async def go_back_form(callback: CallbackQuery):
     await callback.answer()
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                                  caption='text',
+    await callback.message.answer("🎯 Ти майже на старті! Залишився важливий крок – заповнити анкету. Це обов’язкова умова для реєстрації та доступу до курсу.\n"
+                                  "\nАнкета допоможе нам краще зрозуміти твої потреби та зробити навчання більш цінним для тебе. А для тебе – це можливість усвідомити свої цілі та отримати максимальну користь\n"
+                                  "\nЧому це важливо?\n"
+                                  "\n📝 Чіткіше визначиш свої очікування від курсу.\n"
+                                  "📊 Ми адаптуємо матеріали під потреби учасників.\n"
+                                  "🤝 Станеш частиною спільноти однодумців.\n"
+                                  "\nЩо робити?\n"
+                                  "\n1️⃣ Заповни анкету – натисни кнопку нижче.\n"
+                                  "2️⃣ Повернися та натисни 'Я заповнив/ла анкету', щоб перейти до оплати.\n"
+                                  "\n🚀 Ти готовий? Тоді вперед!\n",
                                   reply_markup=sm.accept_inline_markup)
 
 
@@ -159,14 +227,16 @@ async def pay(callback: CallbackQuery):
     await callback.answer()
     await callback.message.answer_photo(
         photo='https://www.apple.com/v/apple-pay/u/images/meta/apple_pay__c08w264834sy_og.png?202502121246',
-        caption='text',
+        caption='Pay',
         reply_markup=sm.pay_inline_markup)
 
 
 @dp.callback_query(F.data == 'to_pay')
 async def front_of_menu(callback: CallbackQuery):
-    await callback.message.answer('https://drive.google.com/file/d/1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9/view',
-                                  reply_markup=sm.menu_buttons_keyboard)
+    video_id = 'BAACAgIAAxkBAAPFZ8Bu8ajHtoaignWxQ97udddTYCwAAq5hAAJXDAhKFdXY_cFCbyE2BA'
+    await callback.answer()
+    await callback.message.answer_video(video_id,
+                                        reply_markup=sm.menu_buttons_keyboard)
 
 
 @dp.message(F.text == "Навчання 📚")
@@ -185,9 +255,6 @@ async def study(message: Message):
 async def study_how(message: Message):
 
     await message.answer('text', reply_markup=sm.module_back_buttons_keyboard)
-    # video_url = 'https://drive.google.com/uc?export=download&id=1X3XKbHSVr6j-ljYcoKWvFUSftAwFyqL9'
-
-    # await message.answer_video(video_url,)
 
 
 @dp.message(lambda message: message.text.startswith('Модуль'))
@@ -220,94 +287,127 @@ async def handle_lesson(message: Message):
     tel_id = message.from_user.id
     module_number = await AsyncDB.get_user_progress_current_module(tel_id)
     current_module = await AsyncDB.get_user_current_module(tel_id)
-    current_lesson = await AsyncDB.get_current_lesson(tel_id)
+    current_lesson = await AsyncDB.get_current_lesson(tel_id)  # Получаем текущий урок пользователя
+    await update_current_video_index_0(module_number, lesson_number)
+    await update_current_test_index_0(module_number, lesson_number)
+    current_video_index = await get_current_video_index(module_number, lesson_number)  # Получаем текущий индекс видео
 
+    # Если пользователь пытается перейти к уроку, который соответствует текущему уроку
     if module_number == current_module and lesson_number == current_lesson:
-        await update_current_video_index_0(lesson_number, module_number)
-
         await AsyncDB.update_user_progress_lesson(tel_id, lesson_number)
 
         lesson_data = await get_lesson_data_json(module_number, lesson_number)
 
         if lesson_data:
-            first_video = lesson_data["video"][0].get("video_1")  # Первая ссылка на видео
-            first_test_link = lesson_data["test_links"][0].get("test_1")  # Первая ссылка на тест
+            if "video" in lesson_data and len(lesson_data["video"]) > 0:
+                video_data = lesson_data["video"]
+                # Получаем видео по текущему индексу
+                video_to_send = video_data[current_video_index]
+                first_video_id = video_to_send.get("video_id")
+                if first_video_id:
+                    # Создаём инлайн-кнопку с ссылкой на тест
+                    test_data = lesson_data.get("tests", [])
+                    if test_data:
+                        # Берем первую ссылку из списка тестов
+                        test_url = test_data[current_video_index]["url"]
+                        inline_button = InlineKeyboardButton(text=f"📝 Пройдіть тест — перевірте, що засвоїли! 🚀",
+                                                             url=test_url)
+                        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button]])
 
-            # Создаем инлайн кнопку для теста
-            test_button = InlineKeyboardButton(text="Пройти тест", url=first_test_link)
+                        # Создаем реплай-кнопку для продолжения
+                        next_button = KeyboardButton(text="Далі")
+                        lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
 
-            # Создаем инлайн клавиатуру
-            lesson_keyboard = InlineKeyboardMarkup(inline_keyboard=[[test_button]])
+                        # Обновляем индекс видео для следующего раза
+                        next_video_index = current_video_index + 1
+                        await update_current_video_index(module_number, lesson_number, next_video_index)
+                        await update_current_test_index(module_number, lesson_number, next_video_index)
 
-            # Создаем реплай-кнопку для продолжения
-            next_button = KeyboardButton(text="Далі")
-            lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
+                        # Отправляем видео с кнопкой
+                        await message.answer_video(
+                            video=first_video_id,
+                            caption=f'{lesson_data.get("title")}',
+                            reply_markup=inline_keyboard
+                        )
+                        await message.answer(f"{video_to_send['title']}",
+                                             reply_markup=lesson_keyboard_reply)
 
-            # Отправляем сообщение с видео и кнопкой
-            await message.answer(
-                f"Ваше видео для {lesson_data['title']}:\n{first_video}",
-                reply_markup=lesson_keyboard
-            )
-
-            if not lesson_data:
-                await message.answer("Урок не найден в базе данных.")
-                return
-
-            # Получаем индекс текущего видео
-            video_index = lesson_data['current_video_index']
-            await update_current_video_index(module_number, lesson_number, video_index + 1)
-            await update_current_test_index(module_number, lesson_number, video_index + 1)
-            await message.answer("Для перехода к следующему шагу, нажмите 'Далі'.",
-                                 reply_markup=lesson_keyboard_reply)  # Здесь реплай-кнопка)
+                else:
+                    await message.answer("ID видео отсутствует в данных.")
+            else:
+                await message.answer("В уроке нет видео.")
         else:
             await message.answer("Не удалось найти данные об уроке.")
     else:
-        lesson_data = await get_videos_by_module_lesson(module_number, lesson_number)
-        await message.answer(f'Вот усі відео {lesson_data}',
-                             reply_markup=sm.lesson_back_buttons_keyboard)
+
+        number = 0
+        lesson_data = await get_lesson_data_json(module_number, lesson_number)
+        await message.answer(f'{lesson_data.get("title")}')
+
+        while number < len(lesson_data['video']):
+            video_data = lesson_data["video"]
+            # Получаем видео по текущему индексу
+            video_to_send = video_data[number]
+            video_id = video_to_send.get("video_id")
+
+            await message.answer_video(video_id,
+                                       caption=f"{video_to_send['title']}")
+            number += 1
+        else:
+            await message.answer("Ось усі відео з цього уроку.",
+                                 reply_markup=sm.lesson_back_buttons_keyboard)
 
 
 # Обработчик для кнопки "Далі"
 @dp.message(lambda message: message.text == 'Далі')
 async def handle_next_button(message: Message):
     tel_id = message.from_user.id
-    current_module = await AsyncDB.get_user_progress_current_module(tel_id)
-
-    # Получаем текущий урок пользователя
-    current_lesson_data = await AsyncDB.get_user_progress_current_lesson(tel_id)
+    module_number = await AsyncDB.get_user_progress_current_module(tel_id)
+    lesson_number = await AsyncDB.get_user_progress_current_lesson(tel_id)
     # Получаем данные урока из JSON
-    lesson_data = await get_lesson_data_json(current_module, current_lesson_data)
+    lesson_data = await get_lesson_data_json(module_number, lesson_number)
 
-    if not current_lesson_data:
-        await message.answer("Урок не найден.")
-        return
+    # Получаем текущий индекс видео
+    current_video_index = await get_current_video_index(module_number, lesson_number)
 
-    if not lesson_data:
-        await message.answer("Урок не найден в базе данных.")
-        return
+    if lesson_data:
+        if current_video_index < len(lesson_data['video']):
+            video_data = lesson_data["video"]
+            # Получаем видео по текущему индексу
+            video_to_send = video_data[current_video_index]
+            first_video_id = video_to_send.get("video_id")
+            if first_video_id:
+                # Создаём инлайн-кнопку с ссылкой на тест
+                test_data = lesson_data.get("tests", [])
+                if test_data:
+                    # Берем первую ссылку из списка тестов
+                    test_url = test_data[current_video_index]["url"]
+                    inline_button = InlineKeyboardButton(text=f"📝 Пройдіть тест — перевірте, що засвоїли! 🚀",
+                                                         url=test_url)
+                    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button]])
 
-    # Получаем индекс текущего видео
-    video_index = lesson_data['current_video_index']
+                    # Создаем реплай-кнопку для продолжения
+                    next_button = KeyboardButton(text="Далі")
+                    lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
 
-    # Проверяем, есть ли следующее видео
-    if video_index < len(lesson_data['video']):
-        # Получаем ссылку на следующее видео
-        video_url = list(lesson_data['video'][video_index].values())[0]  # получаем ссылку на видео
-        test_index = lesson_data['current_test_index']
-        if test_index < len(lesson_data['test_links']):
-            # Получаем ссылку на следующий тест
-            test_url = list(lesson_data['test_links'][test_index].values())[0]  # получаем ссылку на тест
-            # Создаем инлайн кнопку для теста
-            test_button = InlineKeyboardButton(text="Пройти тест", url=test_url)
+                    # Обновляем индекс видео для следующего раза
+                    next_video_index = current_video_index + 1
+                    await update_current_video_index(module_number, lesson_number, next_video_index)
+                    await update_current_test_index(module_number, lesson_number, next_video_index)
 
-            # Создаем инлайн клавиатуру
-            lesson_keyboard = InlineKeyboardMarkup(inline_keyboard=[[test_button]])
-            # Обновляем индекс видео для пользователя
-            await update_current_video_index(current_module, current_lesson_data, video_index + 1)
-            await message.answer(f"Смотрите видео: {video_url}",
-                                 reply_markup=lesson_keyboard)
+                    # Отправляем видео с кнопкой
+                    await message.answer_video(
+                        video=first_video_id,
+                        reply_markup=inline_keyboard
+                    )
+                    await message.answer(f"{video_to_send['title']}",
+                                         reply_markup=lesson_keyboard_reply)
+            else:
+                await message.answer("Ви молодці приступайте до наступного уроку",
+                                     reply_markup=sm.get_next_lesson_keyboard())
         else:
-            await message.answer('Ви молодці!')
+            await message.answer("Ви молодці приступайте до наступного уроку",
+                                 reply_markup=sm.get_next_lesson_keyboard())
     else:
         await message.answer("Ви молодці приступайте до наступного уроку",
                              reply_markup=sm.get_next_lesson_keyboard())
@@ -367,23 +467,23 @@ async def back_to_lessons(message: Message):
     await message.answer("Ви повернулись до модулів:", reply_markup=keyboard)
 
 
-async def check_modules():
-    """Проверяет пользователей и открывает новый модуль, если прошло 15 дней."""
-    users = await AsyncDB.get_all_users()  # Получаем всех пользователей
-
-    for user in users:
-        if user.module_start_date and user.current_module < 6:
-            days_passed = (datetime.now().date() - user.module_start_date).days
-            if days_passed >= 15:
-                await AsyncDB.update_current_module(user.tel_id, user.current_module + 1)
-                await AsyncDB.set_module_start_date(user.tel_id)
-
-
+# async def check_modules():
+#     """Проверяет пользователей и открывает новый модуль, если прошло 15 дней."""
+#     users = await AsyncDB.get_all_users()  # Получаем всех пользователей
+#
+#     for user in users:
+#         if user.module_start_date and user.current_module < 6:
+#             days_passed = (datetime.now().date() - user.module_start_date).days
+#             if days_passed >= 15:
+#                 await AsyncDB.update_current_module(user.tel_id, user.current_module + 1)
+#                 await AsyncDB.set_module_start_date(user.tel_id)
+#
+#
 async def scheduler():
     while True:
         await block_inactive_users()
-        await check_modules()
-        await asyncio.sleep(86400)
+#         await check_modules()
+#         await asyncio.sleep(86400)
 
 
 async def main():

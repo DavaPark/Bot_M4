@@ -3,32 +3,38 @@
         {
             "lesson_id": 1,
             "module_id": 1,
-            "title": "Первый урок",
+            "title": "📖 Урок 1",
             "video": [
-                 {
-                    "video_1": "lesson_1_1_1.mp4"
+                {
+                    "video_id": "BAACAgIAAxkBAAPTZ8BzHur-Af5fCosz-pf3DHY7-dcAAudhAAJXDAhKe4-_bc4Df2s2BA",
+                    "title": "<b>Для чого організовувати нові церкви?</b>\nЧи справді нам потрібно створювати нові церкви? Пееп Саар пояснює, чому ключ не в будівлях, а в учнях. Дізнайтесь, як глобалізація, субкультури та відсутність помісних церков відкривають нові можливості для служіння."
                 },
                 {
-                    "video_2": "lesson_1_1_2.mp4"
+                    "video_id": "BAACAgIAAxkBAAPVZ8BzNsEo-G8bErIlnV4VfIslYwAD6mEAAlcMCEqMjF4eG3GGCzYE",
+                    "title": "<b>Для чого організовувати нові церкви?</b>\nЧому ми організовуємо нові церкви, якщо в Біблії немає прямої заповіді? Доктор Дітріх Шиндлер розкриває, як Божа місія та приклад Ісуса природно ведуть до створення нових громад віри. Дізнайтесь, чому церква — це не мета, а відображення місії Бога."
                 },
                 {
-                    "video_3": "lesson_1_1_3.mp4"
+                    "video_id": "BAACAgIAAxkBAAPXZ8BzZQh0K1331KWYFi828UElxvsAAu1hAAJXDAhKQJzKFqjkEGM2BA",
+                    "title": "<b>Хто організовує нові церкви та чому?</b>\nДоктор Дітріх Шиндлер розповідає, як став організатором нових церков ще підлітком. Дізнайтесь, чому Європа потребує тисячі живих, актуальних церков та хто саме може їх створювати. Які якості роблять організатора церкви справжнім лідером? Давайте з’ясуємо!"
                 }
             ],
-            "test_links": [
+            "tests": [
                 {
-                    "test_1": "https://docs.google.com/forms/d/1ijH00cbj09ciGPkqV7hRqjO0GRmXl7leohMipWO0luI/edit"
+                    "test_id": "test_1",
+                    "url": "https://docs.google.com/forms/d/1ijH00cbj09ciGPkqV7hRqjO0GRmXl7leohMipWO0luI/edit"
                 },
                 {
-                    "test_2": "https://docs.google.com/forms/d/1Z4II8xtw-wwqKJ_AovDpF8qkadoKkLAyhDUu7COdXLY/edit"
+                    "test_id": "test_2",
+                    "url": "https://docs.google.com/forms/d/1Z4II8xtw-wwqKJ_AovDpF8qkadoKkLAyhDUu7COdXLY/edit"
                 },
                 {
-                    "test_3": "https://docs.google.com/forms/d/1o-hhzLMG6U7U2jWzuHVMxXXXaIzcaGivyH9PefMVVz0/edit"
+                    "test_id": "test_3",
+                    "url": "https://docs.google.com/forms/d/1o-hhzLMG6U7U2jWzuHVMxXXXaIzcaGivyH9PefMVVz0/edit"
                 }
             ],
             "pass_score": 80,
             "current_video_index": 0,
-            "current_test_index": 1,
+            "current_test_index": 3,
             "current_lesson_progress": 0
         },
         {
@@ -37,29 +43,35 @@
             "title": "Урок 2",
             "video": [
                 {
-                    "video_1": "lesson_1_1_1.mp4"
+                    "video_id": "BAACAgIAAxkBAAIJ72e-9g9MSi_A5Sl11w0NDBldpvGKAAL0cwACENP4SeChay-F7YH3NgQ",
+                    "title": "Видео 1"
                 },
                 {
-                    "video_2": "lesson_1_1_2.mp4"
+                    "video_id": "BAACAgIAAxkBAAIJ72e-9g9MSi_A5Sl11w0NDBldpvGKAAL0cwACENP4SeChay-F7YH3NgQ",
+                    "title": "Видео 2"
                 },
                 {
-                    "video_3": "lesson_1_1_3.mp4"
+                    "video_id": "BAACAgIAAxkBAAIJ72e-9g9MSi_A5Sl11w0NDBldpvGKAAL0cwACENP4SeChay-F7YH3NgQ",
+                    "title": "Видео 3"
                 }
             ],
-            "test_links": [
+            "tests": [
                 {
-                    "test_1": "https://docs.google.com/forms/d/1tDDcF5QicB_tgg1vX8IVam_SqIsHXXQBugW18bMCih4/edit"
+                    "test_id": "test_1",
+                    "url": "https://docs.google.com/forms/d/1tDDcF5QicB_tgg1vX8IVam_SqIsHXXQBugW18bMCih4/edit"
                 },
                 {
-                    "test_2": "https://docs.google.com/forms/d/11ablWx_N8VOFoR1DRg6nruoGsodBbcm5dWhz9v8IRGg/edit"
+                    "test_id": "test_2",
+                    "url": "https://docs.google.com/forms/d/11ablWx_N8VOFoR1DRg6nruoGsodBbcm5dWhz9v8IRGg/edit"
                 },
                 {
-                    "test_3": "https://docs.google.com/forms/d/1AB6yFnqDK2fsHJbDfrljB0s0xj_473UxdTj174ZwPYk/edit"
+                    "test_id": "test_3",
+                    "url": "https://docs.google.com/forms/d/1AB6yFnqDK2fsHJbDfrljB0s0xj_473UxdTj174ZwPYk/edit"
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 2,
+            "current_video_index": 0,
+            "current_test_index": 3,
             "current_lesson_progress": 0
         },
         {
@@ -68,23 +80,27 @@
             "title": "Урок 3",
             "video": [
                 {
-                    "video_1": "https://drive.google.com/file/d/1ODrUjuImWNwLqKNlAuGY3ngxb1fesVKI/view?usp=drive_link"
+                    "video_id": "BAACAgIAAxkBAAIJ72e-9g9MSi_A5Sl11w0NDBldpvGKAAL0cwACENP4SeChay-F7YH3NgQ",
+                    "title": "Видео 1"
                 },
                 {
-                    "video_2": "https://drive.google.com/file/d/12LcnxoO1CUpN3fgaqm7t-MxphEjIRH94/view?usp=drive_link"
+                    "video_id": "BAACAgIAAxkBAAIJ72e-9g9MSi_A5Sl11w0NDBldpvGKAAL0cwACENP4SeChay-F7YH3NgQ",
+                    "title": "Видео 2"
                 }
             ],
-            "test_links": [
+            "tests": [
                 {
-                    "test_1": "https://docs.google.com/forms/d/1iUETiHPA68Q_d-8bLLtcQD6NK0N2vJnGDrJLqDjWbfc/edit"
+                    "test_id": "test_1",
+                    "url": "https://docs.google.com/forms/d/1iUETiHPA68Q_d-8bLLtcQD6NK0N2vJnGDrJLqDjWbfc/edit"
                 },
                 {
-                    "test_2": "https://docs.google.com/forms/d/1iUETiHPA68Q_d-8bLLtcQD6NK0N2vJnGDrJLqDjWbfc/edit"
+                    "test_id": "test_2",
+                    "url": "https://docs.google.com/forms/d/1iUETiHPA68Q_d-8bLLtcQD6NK0N2vJnGDrJLqDjWbfc/edit"
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 1,
+            "current_video_index": 0,
+            "current_test_index": 2,
             "current_lesson_progress": 0
         }
     ]
