@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ny#380t30&yh(y_$996!&o6t_bgrsocr4qpr!s%%kr8m-_knz3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'myapp1'
 ]
 
 MIDDLEWARE = [
@@ -74,11 +75,16 @@ WSGI_APPLICATION = 'Bot_M4.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'm4bot',
+            'USER': 'remote_root',
+            'PASSWORD': 'Rootrootpass1!',
+            'HOST': '89.43.33.160',
+            'PORT': '3306',
+            'OPTIONS': {'charset': 'utf8mb4'}
+        }
     }
-}
 
 
 # Password validation
