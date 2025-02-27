@@ -71,7 +71,7 @@ back_buttons_keyboard = ReplyKeyboardMarkup(
 )
 
 lesson_back_buttons_keyboard = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text="Вернуться к урокам")]],
+    keyboard=[[KeyboardButton(text="Повернутися до уроків")]],
     resize_keyboard=True
 )
 
@@ -129,7 +129,7 @@ def get_retry_keyboard():
 # Функция для создания клавиатуры с кнопкой "Следующий урок"
 def get_next_lesson_keyboard():
     buttons = [
-        [KeyboardButton(text="Следующий урок")]
+        [KeyboardButton(text="Наступний урок")]
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
     return keyboard
