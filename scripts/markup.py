@@ -80,6 +80,12 @@ module_back_buttons_keyboard = ReplyKeyboardMarkup(
 )
 
 
+next_module_markup = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Наступний модуль")]],
+    resize_keyboard=True
+)
+
+
 def get_module_keyboard(current_module: int) -> ReplyKeyboardMarkup:
     buttons = [[KeyboardButton(text=f"Модуль {i}")] for i in range(1, current_module + 1)]
     buttons.append([KeyboardButton(text='Як навчатися?')])
@@ -114,6 +120,7 @@ def get_lesson_more_keyboard(test_url):
     ]
     keyboard = ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
     return keyboard
+
 
 
 # Функция для кнопки "Пройти знову"
