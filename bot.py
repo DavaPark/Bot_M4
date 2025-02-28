@@ -154,7 +154,7 @@ EMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 async def accept(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RegisterState.waiting_for_email)
     await callback.answer()
-    existing_user = await AsyncDB.get_user_by_telegram_id(callback.chat.id)
+    existing_user = await AsyncDB.get_user_by_telegram_id(callback.from_user.id)
     if existing_user:
         await callback.message.answer('✅ Ви вже зареєстровані! Продовжуємо...',
                                       reply_markup=sm.accept_inline_markup)
@@ -298,6 +298,15 @@ async def study_how(message: Message):
 async def handle_module(message: Message):
     module_number = int(message.text.split(" ")[1])  # Получаем номер модуля
     tel_id = message.chat.id
+
+    current_module = await AsyncDB.get_user_progress_current_module(tel_id)
+    current_lesson = await AsyncDB.get_user_progress_current_lesson(tel_id)
+    if current_module == 1:
+        lesson_data = await get_lesson_data_json(current_module, current_lesson)
+        video_data = lesson_data["video_module"]
+        # Получаем видео по текущему индексу
+        video_to_send = video_data[0]
+        await message.answer(f"{video_to_send['title1']}")
 
     await AsyncDB.update_user_progress_module(tel_id, module_number)
 
@@ -538,6 +547,23 @@ async def back_to_lessons(message: Message):
     keyboard = sm.get_module_keyboard(getattr(user, "current_module", 1))
     await message.answer("Ви повернулись до модулів:", reply_markup=keyboard)
 
+
+@dp.message(F.text == "Наступний модуль")
+async def next_module(message: Message):
+    # Получаем пользователя из БД по telegram_id
+    user = await AsyncDB.get_user_by_telegram_id(message.from_user.id)
+
+    if user:
+        user = await AsyncDB.get_user(message.from_user.id)
+
+        if not user:
+            await message.answer("Вы не зарегистрированы.")
+            return
+
+        keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+        await message.answer("Наступний модуль ще не відкрит:", reply_markup=keyboard)
+    else:
+        await message.answer("Пользователь не найден в базе данных.")
 
 # async def check_modules():
 #     """Проверяет пользователей и открывает новый модуль, если прошло 15 дней."""
