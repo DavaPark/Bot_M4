@@ -1,11 +1,10 @@
 import json
+
 import aiomysql
 from aiogram import Bot
-from aiogram.client.session import aiohttp
 
-from scripts.config import DB_CONFIG, TOKEN_API
-from scripts.models import User
-from scripts.models import Lessons
+from scripts.config import DB_CONFIG, TOKEN_API, MODULES_TEMPLATE
+from scripts.models import User, UserProgress
 
 bot = Bot(TOKEN_API)
 
@@ -256,6 +255,40 @@ class AsyncDB:
         await conn.ensure_closed()  # Закрываем соединение
         return None
 
+    @staticmethod
+    async def check_module_score(tel_id, module_num):
+        conn = await AsyncDB.get_connection()  # Добавляем await
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(f"SELECT progress FROM user_progress WHERE tel_id={tel_id};")
+            result = await cursor.fetchone()
+            if result:
+                if result["progress"] is None or result["progress"] == '':
+                    await cursor.execute("""
+                                        UPDATE user_progress
+                                        SET progress = %s
+                                        WHERE tel_id = %s
+                                    """, (str(json.dumps({f'module{module_num}': MODULES_TEMPLATE[f"MODULE_{module_num}"]})), tel_id))
+
+                    await conn.commit()
+                    return
+                else:
+                    current_progress = dict(json.loads(result["progress"]))
+                    if f'module{module_num}' not in current_progress:
+                        current_progress[f"module{module_num}"] = MODULES_TEMPLATE[f"MODULE_{module_num}"]
+                        await cursor.execute("""UPDATE user_progress SET progress = %s WHERE tel_id = %s;""", (
+                        str(current_progress), tel_id))
+                        await conn.commit()
+                        return
+
+    @staticmethod
+    async def get_user_progress(tel_id):
+        conn = await AsyncDB.get_connection()  # Добавляем await
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute(f"SELECT * FROM user_progress WHERE tel_id={tel_id};")
+            result = await cursor.fetchone()
+            if result:
+                return UserProgress(**result)
+        return None
 
 # Функция для получения данных урока
 async def get_lesson_data(lesson_id: int, module_id: int):

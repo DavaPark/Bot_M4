@@ -58,7 +58,8 @@ class Lessons:
 
 
 class UserProgress:
-    def __init__(self, tel_id, name, email, select_module, select_lesson, test_score, completed_at):
+    def __init__(self, id, tel_id, name, email, select_module, select_lesson, test_score, completed_at, progress):
+        self.id = id
         self.tel_id = tel_id
         self.name = name
         self.email = email
@@ -66,3 +67,4 @@ class UserProgress:
         self.select_lesson = select_lesson
         self.test_score = test_score
         self.completed_at = completed_at
+        self.progress = progress

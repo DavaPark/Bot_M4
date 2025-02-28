@@ -111,6 +111,24 @@ class User(models.Model):
     def __str__(self):
         return self.name
 
+
+class UserProgress(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ID записи')
+    tel_id = models.BigIntegerField(verbose_name='Telegram ID пользователя')
+    name = models.CharField(max_length=255, verbose_name='Имя')
+    email = models.CharField(verbose_name='Email', max_length=255,)
+    # module_id = models.ForeignKey(Module, on_delete=models.CASCADE, blank=False, verbose_name='Номер модуля')
+    # lesson_id = models.ForeignKey(Lessons, on_delete=models.CASCADE, blank=False, verbose_name='Номер урока')
+    test_score = models.IntegerField(blank=False, verbose_name='Оценка за предыдущий тест')
+    completed_at = models.CharField(blank=False, max_length=255, verbose_name='Дата когда перещёл на новый урок')
+    progress = models.JSONField(blank=True, verbose_name="Прогресс пользователя")
+
+    class Meta:
+        verbose_name = 'Прогресс пользователя'
+        verbose_name_plural = 'Прогресс пользователя'
+        db_table = 'user_progress'
+        managed = False
+
 # class Archive(models.Model):
 #     id = models.IntegerField(primary_key=True, verbose_name='ID записи')
 #     tel_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Telegram ID пользователя')
@@ -179,21 +197,6 @@ class User(models.Model):
 #         managed = False
 #
 #
-# class UserProgress(models.Model):
-#     id = models.IntegerField(primary_key=True, blank=False, verbose_name='ID записи')
-#     tel_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Telegram ID пользователя')
-#     name = models.ForeignKey(User, on_delete=models.CASCADE, max_length=255, verbose_name='Имя')
-#     email = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Емеил')
-#     module_id = models.ForeignKey(Module, on_delete=models.CASCADE, blank=False, verbose_name='Номер модуля')
-#     lesson_id = models.ForeignKey(Lessons, on_delete=models.CASCADE, blank=False, verbose_name='Номер урока')
-#     test_score = models.IntegerField(blank=False, verbose_name='Оценка за предыдущий тест')
-#     completed_at = models.CharField(blank=False, verbose_name='Дата когда перещёл на новый урок')
-#
-#     class Meta:
-#         verbose_name = 'Прогресс пользователя'
-#         verbose_name_plural = 'Прогресс пользователя'
-#         db_table = 'user_progress'
-#         managed = False
 #
 #
 # class Payment(models.Model):

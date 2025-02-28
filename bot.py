@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import re
 
@@ -26,8 +27,8 @@ dp = Dispatcher()
 
 @dp.message(CommandStart())
 async def cmd_start(message: Message):
-    await AsyncDB.update_user(message.from_user.id, last_date=datetime.now().date())
-    existing_user = await AsyncDB.get_user_by_telegram_id(message.from_user.id)
+    await AsyncDB.update_user(message.chat.id, last_date=datetime.now().date())
+    existing_user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
     if existing_user:
         video_id = 'BAACAgIAAxkBAAPFZ8Bu8ajHtoaignWxQ97udddTYCwAAq5hAAJXDAhKFdXY_cFCbyE2BA'
         await message.answer_video(video_id,
@@ -39,8 +40,8 @@ async def cmd_start(message: Message):
         await message.answer("👋 Привіт! <b>Раді, що ти тут!</b> Якщо ти дивишся це відео, значить, прагнеш зрозуміти свій поклик. І це чудово! 🎯\n"
                              "\n<b>М4 Інтенсив</b> – це 90 днів практичного навчання, що допоможе тобі знайти своє місце в служінні. Ми підтримаємо тебе на цьому шляху та дамо інструменти для впевненого старту.\n"
                              "\n<b>Як почати?</b>\n"
-                             "\n🔹 <b>Щоб впевнитися, що це для тебе – переглянь інформацію під відео: про нас, програму курсу, відгуки учасників. Досліджуй та приймай рішення!\n"
-                             "🔹 <b>Готовий зробити крок? Натискай 'Зареєструватися', заповнюй форму та ставай частиною нашої спільноти! 🚀",
+                             "\n🔹 <b>Щоб впевнитися, що це для тебе</b> – переглянь інформацію під відео: про нас, програму курсу, відгуки учасників. Досліджуй та приймай рішення!\n"
+                             "🔹 <b>Готовий зробити крок?</b> Натискай 'Зареєструватися', заповнюй форму та ставай частиною нашої спільноти! 🚀",
                              reply_markup=sm.main_regicter_inline_markup)
 
 
@@ -153,7 +154,7 @@ EMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 async def accept(callback: CallbackQuery, state: FSMContext):
     await state.set_state(RegisterState.waiting_for_email)
     await callback.answer()
-    existing_user = await AsyncDB.get_user_by_telegram_id(callback.from_user.id)
+    existing_user = await AsyncDB.get_user_by_telegram_id(callback.chat.id)
     if existing_user:
         await callback.message.answer('✅ Ви вже зареєстровані! Продовжуємо...',
                                       reply_markup=sm.accept_inline_markup)
@@ -176,12 +177,12 @@ async def process_email(message: Message, state: FSMContext):
     await state.update_data(email=email)
     user_data = await state.get_data()
     await AsyncDB.create_user(
-        telegram_id=message.from_user.id,
+        telegram_id=message.chat.id,
         name=message.from_user.full_name,
         email=user_data["email"],
         username=message.from_user.username
     )
-    await AsyncDB.create_user_progress(telegram_id=message.from_user.id)
+    await AsyncDB.create_user_progress(telegram_id=message.chat.id)
     await bot.send_message(
         message.chat.id,
         "🎯 Ти майже на старті! Залишився важливий крок – заповнити анкету. Це обов’язкова умова для реєстрації та доступу до курсу.\n"
@@ -237,11 +238,22 @@ async def go_back_form(callback: CallbackQuery):
                                   reply_markup=sm.accept_inline_markup)
 
 
+@dp.callback_query(F.data == 'to_pay')
+async def front_of_menu(callback: CallbackQuery):
+
+    # при успешной оплате
+    video_id = 'BAACAgIAAxkBAAPFZ8Bu8ajHtoaignWxQ97udddTYCwAAq5hAAJXDAhKFdXY_cFCbyE2BA'
+    await callback.answer()
+    await callback.message.answer_video(video_id,
+                                        reply_markup=sm.menu_buttons_keyboard)
+
+
+
 @dp.callback_query(F.data == 'check_registration_form')
 async def check_registration_form(callback: CallbackQuery):
     tel_id = callback.message.chat.id
     user = await AsyncDB.get_user(tel_id)
-    # await bot.delete_message(tel_id, callback.message.message_id)
+    await bot.delete_message(tel_id, callback.message.message_id)
     if user:
         if user.phone and user.region and user.denomination and user.role:
             if len(user.phone) != 0 and len(user.region) != 0 and len(user.denomination) != 0 and len(user.role) != 0:
@@ -265,26 +277,14 @@ async def check_registration_form(callback: CallbackQuery):
     await bot.send_message(tel_id, not_registered_yet, reply_markup=sm.form_inline_markup)
 
 
-
-@dp.callback_query(F.data == 'to_pay')
-async def front_of_menu(callback: CallbackQuery):
-
-    # при успешной оплате
-    video_id = 'BAACAgIAAxkBAAPFZ8Bu8ajHtoaignWxQ97udddTYCwAAq5hAAJXDAhKFdXY_cFCbyE2BA'
-    await callback.answer()
-    await callback.message.answer_video(video_id,
-                                        reply_markup=sm.menu_buttons_keyboard)
-
-
 @dp.message(F.text == "Навчання 📚")
 async def study(message: Message):
-    user = await AsyncDB.get_user(message.from_user.id)
+    user = await AsyncDB.get_user(message.chat.id)
 
     if not user:
         await message.answer("Вы не зарегистрированы.")
         return
-
-    keyboard = sm.get_module_keyboard(getattr(user, "current_module", 1))
+    keyboard = sm.get_module_keyboard(getattr(user, "current_module", 1) or 1)
     await message.answer("Оберіть модуль:", reply_markup=keyboard)
 
 
@@ -297,21 +297,22 @@ async def study_how(message: Message):
 @dp.message(lambda message: message.text.startswith('Модуль'))
 async def handle_module(message: Message):
     module_number = int(message.text.split(" ")[1])  # Получаем номер модуля
-    tel_id = message.from_user.id
+    tel_id = message.chat.id
 
     await AsyncDB.update_user_progress_module(tel_id, module_number)
 
     # Получаем пользователя из БД по telegram_id
-    user = await AsyncDB.get_user_by_telegram_id(message.from_user.id)
+    user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
 
     if user:
-        user = await AsyncDB.get_user(message.from_user.id)
+        user = await AsyncDB.get_user(message.chat.id)
 
         if not user:
             await message.answer("Вы не зарегистрированы.")
             return
 
         keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+        await AsyncDB.check_module_score(tel_id, module_number)
         await message.answer("Оберіть урок:", reply_markup=keyboard)
     else:
         await message.answer("Пользователь не найден в базе данных.")
@@ -321,7 +322,7 @@ async def handle_module(message: Message):
 @dp.message(lambda message: message.text.startswith('Урок'))
 async def handle_lesson(message: Message):
     lesson_number = int(message.text.split(" ")[1])  # Получаем номер урока
-    tel_id = message.from_user.id
+    tel_id = message.chat.id
     module_number = await AsyncDB.get_user_progress_current_module(tel_id)
     current_module = await AsyncDB.get_user_current_module(tel_id)
     current_lesson = await AsyncDB.get_current_lesson(tel_id)  # Получаем текущий урок пользователя
@@ -349,11 +350,13 @@ async def handle_lesson(message: Message):
                         test_url = test_data[current_video_index]["url"]
                         inline_button = InlineKeyboardButton(text=f"📝 Пройдіть тест — перевірте, що засвоїли! 🚀",
                                                              url=test_url)
-                        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button]])
+                        inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
+                                                              callback_data="next_lesson_part")
+                        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
 
                         # Создаем реплай-кнопку для продолжения
-                        next_button = KeyboardButton(text="Далі")
-                        lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
+                        # next_button = KeyboardButton(text="Далі")
+                        # lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
 
                         # Обновляем индекс видео для следующего раза
                         next_video_index = current_video_index + 1
@@ -363,11 +366,11 @@ async def handle_lesson(message: Message):
                         # Отправляем видео с кнопкой
                         await message.answer_video(
                             video=first_video_id,
-                            caption=f'{lesson_data.get("title")}',
+                            caption=f'{lesson_data.get("title")}\n \n {video_to_send["title"]}',
                             reply_markup=inline_keyboard
                         )
-                        await message.answer(f"{video_to_send['title']}",
-                                             reply_markup=lesson_keyboard_reply)
+                        # await message.answer(f"{video_to_send['title']}",
+                        #                      reply_markup=lesson_keyboard_reply)
 
                 else:
                     await message.answer("ID видео отсутствует в данных.")
@@ -395,19 +398,48 @@ async def handle_lesson(message: Message):
                                  reply_markup=sm.lesson_back_buttons_keyboard)
 
 
+@dp.callback_query(F.data == 'next_lesson_part')
+async def front_of_menu(callback: CallbackQuery):
+    tel_id = callback.message.chat.id
+    _up_ = await AsyncDB.get_user_progress(tel_id)
+    up = dict(json.loads(_up_.progress))
+    module_number = _up_.select_module
+    lesson_number = _up_.select_lesson
+    current_video_index = await get_current_video_index(module_number, lesson_number)
+    test_result = up[f"module{module_number}"][f"lesson{lesson_number}"][str(current_video_index)]
+    if test_result is not None:
+        if int(test_result) < 80:
+            lesson_data = await get_lesson_data_json(module_number, lesson_number)
+            test_data = lesson_data.get("tests", [])
+            test_url = test_data[current_video_index]["url"]
+            inline_button = InlineKeyboardButton(text=f"📝 Пройдіть тест — перевірте, що засвоїли! 🚀",
+                                                 url=test_url)
+            inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
+                                                  callback_data="next_lesson_part")
+            inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
+            await bot.send_message(tel_id, failed_test, reply_markup=inline_keyboard)
+        else:
+            await handle_next_button(callback.message)  # переход дальше
+    else:
+        await bot.send_message(tel_id, test_not_passed)
+        return
+
+
+
+
 # Обработчик для кнопки "Далі"
-@dp.message(lambda message: message.text == 'Далі')
 async def handle_next_button(message: Message):
-    tel_id = message.from_user.id
+    tel_id = message.chat.id
     module_number = await AsyncDB.get_user_progress_current_module(tel_id)
     lesson_number = await AsyncDB.get_user_progress_current_lesson(tel_id)
     # Получаем данные урока из JSON
     lesson_data = await get_lesson_data_json(module_number, lesson_number)
-
+    print(lesson_data)
     # Получаем текущий индекс видео
     current_video_index = await get_current_video_index(module_number, lesson_number)
 
     if lesson_data:
+        print(current_video_index, len(lesson_data['video']))
         if current_video_index < len(lesson_data['video']):
             video_data = lesson_data["video"]
             # Получаем видео по текущему индексу
@@ -421,11 +453,13 @@ async def handle_next_button(message: Message):
                     test_url = test_data[current_video_index]["url"]
                     inline_button = InlineKeyboardButton(text=f"📝 Пройдіть тест — перевірте, що засвоїли! 🚀",
                                                          url=test_url)
-                    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button]])
+                    inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
+                                                          callback_data="next_lesson_part")
+                    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
 
                     # Создаем реплай-кнопку для продолжения
-                    next_button = KeyboardButton(text="Далі")
-                    lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
+                    # next_button = KeyboardButton(text="Далі")
+                    # lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
 
                     # Обновляем индекс видео для следующего раза
                     next_video_index = current_video_index + 1
@@ -435,10 +469,11 @@ async def handle_next_button(message: Message):
                     # Отправляем видео с кнопкой
                     await message.answer_video(
                         video=first_video_id,
+                        caption=f"{video_to_send['title']}",
                         reply_markup=inline_keyboard
                     )
-                    await message.answer(f"{video_to_send['title']}",
-                                         reply_markup=lesson_keyboard_reply)
+                    # await message.answer(f"{video_to_send['title']}",
+                    #                      reply_markup=lesson_keyboard_reply)
             else:
                 await message.answer("Ви молодці приступайте до наступного уроку",
                                      reply_markup=sm.get_next_lesson_keyboard())
@@ -452,7 +487,7 @@ async def handle_next_button(message: Message):
 
 @dp.message(lambda message: message.text == "Наступний урок")
 async def handle_next_lesson(message: Message):
-    tel_id = message.from_user.id
+    tel_id = message.chat.id
     current_lesson = await AsyncDB.get_current_lesson(tel_id)
     next_lesson = current_lesson + 1
 
@@ -476,10 +511,10 @@ async def handle_next_lesson(message: Message):
 @dp.message(F.text == "Повернутися до уроків")
 async def back_to_lessons(message: Message):
     # Получаем пользователя из БД по telegram_id
-    user = await AsyncDB.get_user_by_telegram_id(message.from_user.id)
+    user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
 
     if user:
-        user = await AsyncDB.get_user(message.from_user.id)
+        user = await AsyncDB.get_user(message.chat.id)
 
         if not user:
             await message.answer("Вы не зарегистрированы.")
@@ -499,7 +534,7 @@ async def back_to_lessons(message: Message):
 
 @dp.message(F.text == "🔙Модулі")
 async def back_to_lessons(message: Message):
-    user = await AsyncDB.get_user(message.from_user.id)
+    user = await AsyncDB.get_user(message.chat.id)
     keyboard = sm.get_module_keyboard(getattr(user, "current_module", 1))
     await message.answer("Ви повернулись до модулів:", reply_markup=keyboard)
 

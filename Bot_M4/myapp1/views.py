@@ -193,4 +193,24 @@ def registrationForm(request):
 	return JsonResponse({"status": "success"})
 
 
-# {'merchantAccount': 'test_merch_n1', 'orderReference': 'M4-420404892-0', 'merchantSignature': '742415d0a1bc04ad29e14bf330d81e27', 'amount': 1, 'currency': 'UAH', 'authCode': '', 'email': 'adlkjhcnakajdbf@gmail.com', 'phone': '380998765432', 'createdDate': 1740684838, 'processingDate': 1740684933, 'cardPan': '54****5454', 'cardType': 'MasterCard', 'issuerBankCountry': None, 'issuerBankName': None, 'recToken': '', 'transactionStatus': 'Declined', 'reason': 'Fraud transaction', 'reasonCode': 1114, 'fee': 0, 'paymentSystem': 'card', 'acquirerBankName': 'WayForPay', 'cardProduct': '', 'clientName': 'ANDRII GONCHAROV', 'products': [{'name': 'Оплата за курс M4', 'price': 1, 'count': 1}], 'rrn': '', 'terminal': '', 'acquirer': ''}
+
+@csrf_exempt
+def testScore(request):
+	data = json.loads(request.body)
+	email = data["email"]
+	test_info = data["testInfo"]
+	percentage = data["percentage"]
+	user = User.objects.filter(email=data["email"]).first()
+	if user:
+		user_progress = UserProgress.objects.filter(email=data["email"]).first()
+		up = user_progress.progress
+		if up[f"module{test_info['module']}"][f"lesson{test_info['lesson']}"][f"{test_info['test']}"] == None:
+			up[f"module{test_info['module']}"][f"lesson{test_info['lesson']}"][f"{test_info['test']}"] = percentage
+		else:
+			if percentage > 80:
+				up[f"module{test_info['module']}"][f"lesson{test_info['lesson']}"][f"{test_info['test']}"] = 80
+			else:
+				up[f"module{test_info['module']}"][f"lesson{test_info['lesson']}"][f"{test_info['test']}"] = percentage
+		user_progress.progress = up
+		user_progress.save()
+	return JsonResponse({"status": "success"})
