@@ -27,21 +27,21 @@
             ],
             "tests": [
                 {
-                    "test_id": "test_1",
+                    "test_id": "📝 <b>Пройди тест — перевір, що засвоїв!</b> 🚀",
                     "url": "https://docs.google.com/forms/d/1ijH00cbj09ciGPkqV7hRqjO0GRmXl7leohMipWO0luI/edit"
                 },
                 {
-                    "test_id": "test_2",
+                    "test_id": "📝 <b>Пройди тест і перевір свої відкриття!</b> 🌟",
                     "url": "https://docs.google.com/forms/d/1Z4II8xtw-wwqKJ_AovDpF8qkadoKkLAyhDUu7COdXLY/edit"
                 },
                 {
-                    "test_id": "test_3",
+                    "test_id": "📝 <b>Перевір себе — пройди тест!</b> 🌿",
                     "url": "https://docs.google.com/forms/d/1o-hhzLMG6U7U2jWzuHVMxXXXaIzcaGivyH9PefMVVz0/edit"
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 1,
-            "current_test_index": 1,
+            "current_video_index": 0,
+            "current_test_index": 0,
             "current_lesson_progress": 0
         },
         {
@@ -71,21 +71,21 @@
             ],
             "tests": [
                 {
-                    "test_id": "test_1",
+                    "test_id": "📝 Пройди тест і закріпи знання! ✨",
                     "url": "https://docs.google.com/forms/d/1tDDcF5QicB_tgg1vX8IVam_SqIsHXXQBugW18bMCih4/edit"
                 },
                 {
-                    "test_id": "test_2",
+                    "test_id": "📝 Пройди тест - це допоможе тобі перевірити своє покликання! 🌟",
                     "url": "https://docs.google.com/forms/d/11ablWx_N8VOFoR1DRg6nruoGsodBbcm5dWhz9v8IRGg/edit"
                 },
                 {
-                    "test_id": "test_3",
+                    "test_id": "📝 Готовий до виклику? Перевір свої знання у тесті! 🚀",
                     "url": "https://docs.google.com/forms/d/1AB6yFnqDK2fsHJbDfrljB0s0xj_473UxdTj174ZwPYk/edit"
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 0,
+            "current_test_index": 0,
             "current_lesson_progress": 0
         },
         {
@@ -111,11 +111,11 @@
             ],
             "tests": [
                 {
-                    "test_id": "test_1",
+                    "test_id": "📝 Пройди тест — перевір, що засвоїв! 🌟",
                     "url": "https://docs.google.com/forms/d/1N_BqEh_YgVeWIFg1i3UOaqgYzOkDicFHKaei9Ld9Wjw/edit"
                 },
                 {
-                    "test_id": "test_2",
+                    "test_id": "💡 Пройди тест, щоб закріпити знання та натхненно рухатися далі! 🌟",
                     "url": "https://docs.google.com/forms/d/1iUETiHPA68Q_d-8bLLtcQD6NK0N2vJnGDrJLqDjWbfc/edit"
                 }
             ],
@@ -143,7 +143,7 @@
             ],
             "tests": [
                 {
-                    "test_id": "test_1",
+                    "test_id": "✨ Час перевірити, як добре ти засвоїв матеріал — проходь тест та продовжуй зростати! 🌿💪",
                     "url": "https://docs.google.com/forms/d/1sACUFQH5-iFVV2YHGd7ANaIfPj4TNvx7PJ6XSHMPHTc/edit"
                 }
             ],
@@ -175,11 +175,11 @@
             ],
             "tests": [
                 {
-                    "test_id": "test_1",
+                    "test_id": "🚀 Час перевірити свої знання — переходь до тесту та рухайся вперед! 💡✨",
                     "url": "https://docs.google.com/forms/d/1WC1mmTI_SexMDwIFbefMyosOKRkPrmMD87sDmIf7tjI/edit"
                 },
                 {
-                    "test_id": "test_2",
+                    "test_id": "📝 Перевір себе — пройди тест! ✅",
                     "url": "https://docs.google.com/forms/d/1zc7wwB9pePWXzYqTkjCs8o0nncZUSTo18wOY5JP2NOw/edit"
                 }
             ],
@@ -211,11 +211,11 @@
             ],
             "tests": [
                 {
-                    "test_id": "test_1",
+                    "test_id": "📝 Готовий перевірити, чи ти на правильному шляху? Пройди тест! 🚀",
                     "url": "https://docs.google.com/forms/d/1q6MlhSrSMGINYNQIGxeBe36XFU2cWG-xiA7aOfBFkVE/edit"
                 },
                 {
-                    "test_id": "test_2",
+                    "test_id": "📝 Дізнайся просто зараз — пройди тест! 🚀",
                     "url": "https://docs.google.com/forms/d/18zowqNqzrodU4z4gYefMdnXN0n3oFFHDGAKAx5RmRpk/edit"
                 }
             ],

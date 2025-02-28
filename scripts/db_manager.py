@@ -290,6 +290,7 @@ class AsyncDB:
                 return UserProgress(**result)
         return None
 
+
 # Функция для получения данных урока
 async def get_lesson_data(lesson_id: int, module_id: int):
     async with (await AsyncDB.get_connection()) as conn:
@@ -385,6 +386,31 @@ async def get_current_video_index(module_id, lesson_id):
         for lesson in lessons:
             if lesson['module_id'] == module_id and lesson['lesson_id'] == lesson_id:
                 return lesson.get('current_video_index')
+        return None  # если урок с таким ID и module_id не найден
+
+    except FileNotFoundError:
+        print(f"Файл {FILE_PATH} не найден.")
+    except json.JSONDecodeError:
+        print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
+    return None
+
+
+async def get_current_test_index(module_id, lesson_id):
+    """Получает текущий индекс видео для урока по module_id и lesson_id."""
+    try:
+        async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
+            content = await file.read()
+            data = json.loads(content)
+
+        # Проверяем, есть ли список уроков в данных
+        lessons = data.get("lessons")
+        if not lessons:
+            return None
+
+        # Ищем урок по module_id и lesson_id
+        for lesson in lessons:
+            if lesson['module_id'] == module_id and lesson['lesson_id'] == lesson_id:
+                return lesson.get('current_test_index')
         return None  # если урок с таким ID и module_id не найден
 
     except FileNotFoundError:
