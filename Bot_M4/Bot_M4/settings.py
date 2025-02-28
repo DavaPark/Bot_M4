@@ -26,6 +26,8 @@ SECRET_KEY = 'django-insecure-ny#380t30&yh(y_$996!&o6t_bgrsocr4qpr!s%%kr8m-_knz3
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://m4ukraine.com.ua', 'https://www.m4ukraine.com.ua']
+
 
 
 # Application definition

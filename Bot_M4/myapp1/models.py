@@ -41,6 +41,10 @@ class Payment(models.Model):
     def __str__(self):
         return f"Платіж {self.order_reference} - {self.transaction_status}"
 
+    class Meta:
+        verbose_name = 'Платежі'
+        verbose_name_plural = 'Платежі'
+
 
     @classmethod
     def update_or_create_from_request(cls, data):
@@ -113,62 +117,62 @@ class User(models.Model):
 
 
 class UserProgress(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name='ID записи')
-    tel_id = models.BigIntegerField(verbose_name='Telegram ID пользователя')
-    name = models.CharField(max_length=255, verbose_name='Имя')
-    email = models.CharField(verbose_name='Email', max_length=255,)
+    id = models.AutoField(primary_key=True, verbose_name='ID запису')
+    tel_id = models.BigIntegerField(verbose_name='Telegram ID користувача')
+    name = models.CharField(max_length=255, verbose_name='Ім’я')
+    email = models.CharField(verbose_name='Email', max_length=255)
     # module_id = models.ForeignKey(Module, on_delete=models.CASCADE, blank=False, verbose_name='Номер модуля')
-    # lesson_id = models.ForeignKey(Lessons, on_delete=models.CASCADE, blank=False, verbose_name='Номер урока')
-    test_score = models.IntegerField(blank=False, verbose_name='Оценка за предыдущий тест')
-    completed_at = models.CharField(blank=False, max_length=255, verbose_name='Дата когда перещёл на новый урок')
-    progress = models.JSONField(blank=True, verbose_name="Прогресс пользователя")
+    # lesson_id = models.ForeignKey(Lessons, on_delete=models.CASCADE, blank=False, verbose_name='Номер уроку')
+    test_score = models.IntegerField(blank=False, verbose_name='Оцінка за попередній тест')
+    completed_at = models.CharField(blank=False, max_length=255, verbose_name='Дата переходу на новий урок')
+    progress = models.JSONField(blank=True, verbose_name="Прогрес користувача")
 
     class Meta:
-        verbose_name = 'Прогресс пользователя'
-        verbose_name_plural = 'Прогресс пользователя'
+        verbose_name = 'Прогрес користувача'
+        verbose_name_plural = 'Прогрес користувачів'
         db_table = 'user_progress'
         managed = False
 
-# class Archive(models.Model):
-#     id = models.IntegerField(primary_key=True, verbose_name='ID записи')
-#     tel_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Telegram ID пользователя')
-#     name = models.ForeignKey(User, on_delete=models.CASCADE, max_length=255, verbose_name='Имя')
-#     email = models.ForeignKey(User, on_delete=models.CASCADE, unique=True, verbose_name='Емеил')
-#     context = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, verbose_name='Контекст')
-#     is_blocked = models.ForeignKey(User, on_delete=models.CASCADE, default=False, choices=STATUSES,
-#                                    verbose_name='Статус')
-#     is_admin = models.ForeignKey(User, on_delete=models.CASCADE, default=False, choices=USER_TYPE,
-#                                  verbose_name='Тип пользователя')
-#     create_date = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Дата создания')
-#     last_date = models.CharField(verbose_name='Дата добавления в архив')
-#
-#     class Meta:
-#         verbose_name = 'Архив'
-#         verbose_name_plural = 'Архив'
-#         db_table = 'archive'
-#         managed = False
-#
-#
-# class Deleted(models.Model):
-#     id = models.IntegerField(primary_key=True, verbose_name='ID записи')
-#     tel_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Telegram ID пользователя')
-#     name = models.ForeignKey(User, on_delete=models.CASCADE, max_length=255, verbose_name='Имя')
-#     email = models.ForeignKey(User, on_delete=models.CASCADE, unique=True, verbose_name='Емеил')
-#     context = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, verbose_name='Контекст')
-#     is_blocked = models.ForeignKey(User, on_delete=models.CASCADE, default=False, choices=STATUSES,
-#                                    verbose_name='Статус')
-#     is_admin = models.ForeignKey(User, on_delete=models.CASCADE, default=False, choices=USER_TYPE,
-#                                  verbose_name='Тип пользователя')
-#     create_date = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Дата создания')
-#     last_date = models.CharField(verbose_name='Дата добавления в заблокированные')
-#
-#     class Meta:
-#         verbose_name = 'Заблокированные'
-#         verbose_name_plural = 'Заблокированные'
-#         db_table = 'deleted'
-#         managed = False
-#
-#
+
+class Archive(models.Model):
+    id = models.IntegerField(primary_key=True, verbose_name='ID запису')
+    tel_id = models.BigIntegerField(verbose_name='Telegram ID користувача')
+    name = models.CharField(max_length=255, verbose_name='Ім’я')
+    email = models.CharField(max_length=255, unique=True, verbose_name='Email')
+    context = models.CharField(max_length=255, blank=False, verbose_name='Контекст')
+    is_blocked = models.CharField(max_length=255, default=False, choices=STATUSES,
+                                   verbose_name='Статус')
+    is_admin = models.CharField(max_length=255, default=False, choices=USER_TYPE,
+                                 verbose_name='Тип користувача')
+    last_date = models.CharField(max_length=255, verbose_name='Дата додавання в архів')
+
+    class Meta:
+        verbose_name = 'Архів'
+        verbose_name_plural = 'Архів'
+        db_table = 'archive'
+        managed = False
+
+
+class Deleted(models.Model):
+    id = models.IntegerField(primary_key=True, verbose_name='ID запису')
+    tel_id = models.BigIntegerField(verbose_name='Telegram ID користувача')
+    name = models.CharField(max_length=255, verbose_name='Ім’я')
+    email = models.CharField(max_length=255, unique=True, verbose_name='Email')
+    context = models.CharField(max_length=255, blank=False, verbose_name='Контекст')
+    is_blocked = models.CharField(max_length=255, default=False, choices=STATUSES,
+                                  verbose_name='Статус')
+    is_admin = models.CharField(max_length=255, default=False, choices=USER_TYPE,
+                                verbose_name='Тип користувача')
+    last_date = models.CharField(max_length=255,verbose_name='Дата видалення')
+
+    class Meta:
+        verbose_name = 'Заблоковані'
+        verbose_name_plural = 'Заблоковані'
+        db_table = 'deleted'
+        managed = False
+
+
+
 # class Module(models.Model):
 #     id = models.IntegerField(primary_key=True, blank=False, verbose_name='ID записи')
 #     module_id = models.IntegerField(blank=False, verbose_name='Номер модуля')
