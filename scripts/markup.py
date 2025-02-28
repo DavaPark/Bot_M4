@@ -87,6 +87,7 @@ next_module_markup = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+
 def get_module_keyboard(current_module: int) -> ReplyKeyboardMarkup:
     buttons = [[KeyboardButton(text=f"Модуль {i}")] for i in range(1, current_module + 1)]
     buttons.append([KeyboardButton(text='Як навчатися?')])
