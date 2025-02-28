@@ -80,6 +80,12 @@ module_back_buttons_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+next_module_markup = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Наступний модуль")]
+    ],
+    resize_keyboard=True
+)
 
 def get_module_keyboard(current_module: int) -> ReplyKeyboardMarkup:
     buttons = [[KeyboardButton(text=f"Модуль {i}")] for i in range(1, current_module + 1)]
