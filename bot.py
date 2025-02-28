@@ -277,6 +277,45 @@ async def check_registration_form(callback: CallbackQuery):
     await bot.send_message(tel_id, not_registered_yet, reply_markup=sm.form_inline_markup)
 
 
+@dp.message(F.text == "Корисне")
+async def people(message: Message):
+    inline_button = [
+        [
+            InlineKeyboardButton(text=f"Choko M4Ukraine", url="https://choko.link/M4Ukraine")
+        ]
+    ]
+    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=inline_button)
+    # Отправляем сообщение с кнопкой
+    await message.answer("Натисніть, щоб перейти за посиланням:",
+                         reply_markup=inline_keyboard)
+
+
+@dp.message(F.text == "Підтримка")
+async def people(message: Message):
+    inline_button = [
+        [
+            InlineKeyboardButton(text=f"Підтримка", url="https://t.me/m4_intensive")
+        ]
+    ]
+    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=inline_button)
+    # Отправляем сообщение с кнопкой
+    await message.answer("Підтримка для тебе в будь-який час:",
+                         reply_markup=inline_keyboard)
+
+
+@dp.message(F.text == "Публічний договір")
+async def people(message: Message):
+    inline_button = [
+        [
+            InlineKeyboardButton(text=f"Телеграф", url="https://telegra.ph/Publ%D1%96chna-oferta-na-koristuvannya-poslugami-chat-bota-z-navchalnimi-kursami-02-27")
+        ]
+    ]
+    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=inline_button)
+    # Отправляем сообщение с кнопкой
+    await message.answer("Перехід на статтю у телеграф з договором",
+                         reply_markup=inline_keyboard)
+
+
 @dp.message(F.text == "Навчання 📚")
 async def study(message: Message):
     user = await AsyncDB.get_user(message.chat.id)
@@ -291,7 +330,8 @@ async def study(message: Message):
 @dp.message(F.text == 'Як навчатися?')
 async def study_how(message: Message):
 
-    await message.answer('text', reply_markup=sm.module_back_buttons_keyboard)
+    await message.answer(how_learn,
+                         reply_markup=sm.module_back_buttons_keyboard)
 
 
 @dp.message(lambda message: message.text.startswith('Модуль'))
@@ -504,7 +544,7 @@ async def handle_next_button(message: Message):
                                            reply_markup=sm.next_module_markup)
             else:
                 await message.answer("Ви молодці приступайте до наступного уроку",
-                                 reply_markup=sm.get_next_lesson_keyboard())
+                                     reply_markup=sm.get_next_lesson_keyboard())
     else:
         current_module = await AsyncDB.get_user_current_module(tel_id)
         current_lesson = await AsyncDB.get_current_lesson(tel_id)

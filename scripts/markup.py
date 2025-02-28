@@ -56,7 +56,7 @@ def pay_keyb(link):
 
 menu_buttons_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Навчання 📚"), KeyboardButton(text="Стань частиною М4")],
+        [KeyboardButton(text="Навчання 📚"), KeyboardButton(text="Публічний договір")],
         [KeyboardButton(text="Спільнота"), KeyboardButton(text="Питання-відповіді")],
         [KeyboardButton(text="Корисне"), KeyboardButton(text="Підтримка")],
     ],
