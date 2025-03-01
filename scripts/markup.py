@@ -36,7 +36,7 @@ accept_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
 
 
 form_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Google Forms', url='https://docs.google.com/forms/d/1rKxzZN1LuU7Q6H_vHlocf2CV9dZgK_OVqZH2sBX7HrA/edit')],
+    [InlineKeyboardButton(text='Google Forms', url='https://docs.google.com/forms/d/e/1FAIpQLSeH3TmTV8R3XsfrYpRO6MeVqr1ytrMzgWinGyxjtTWI9--gTQ/viewform?usp=header')],
     [InlineKeyboardButton(text='✅ Я заповнив/ла анкету', callback_data='check_registration_form')],
     # [InlineKeyboardButton(text='Назад 🔙', callback_data='go_back_form')]
 ])
