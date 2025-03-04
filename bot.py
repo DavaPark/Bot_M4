@@ -248,7 +248,6 @@ async def front_of_menu(callback: CallbackQuery):
                                         reply_markup=sm.menu_buttons_keyboard)
 
 
-
 @dp.callback_query(F.data == 'check_registration_form')
 async def check_registration_form(callback: CallbackQuery):
     tel_id = callback.message.chat.id
@@ -339,16 +338,16 @@ async def handle_module(message: Message):
     module_number = int(message.text.split(" ")[1])  # Получаем номер модуля
     tel_id = message.chat.id
 
+    await AsyncDB.update_user_progress_module(tel_id, module_number)
+
     current_module = await AsyncDB.get_user_progress_current_module(tel_id)
     current_lesson = await AsyncDB.get_user_progress_current_lesson(tel_id)
-    if current_module == 1:
+    if current_module == module_number:
         lesson_data = await get_lesson_data_json(current_module, current_lesson)
         video_data = lesson_data["video_module"]
         # Получаем видео по текущему индексу
         video_to_send = video_data[0]
         await message.answer(f"{video_to_send['title1']}")
-
-    await AsyncDB.update_user_progress_module(tel_id, module_number)
 
     # Получаем пользователя из БД по telegram_id
     user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
@@ -615,37 +614,58 @@ async def back_to_lessons(message: Message):
 
 @dp.message(F.text == "Наступний модуль")
 async def next_module(message: Message):
-    # Получаем пользователя из БД по telegram_id
-    user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
 
-    if user:
-        user = await AsyncDB.get_user(message.chat.id)
+    user = await AsyncDB.get_user(message.chat.id)
+    module_start_date = await AsyncDB.get_module_start_date(message.chat.id)
 
-        if not user:
-            await message.answer("Вы не зарегистрированы.")
+    if not user:
+        await message.answer("Вы не зарегистрированы.")
+        return
+
+    if module_start_date:
+        module_start_date = module_start_date.date() if isinstance(module_start_date, datetime) else module_start_date
+        days_passed = (datetime.now().date() - module_start_date).days
+        days_left = 15 - days_passed
+
+        if days_passed < 15:
+            keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+            await message.answer(f"Наступний модуль буде відкрито через {days_left} днів.",
+                                 reply_markup=keyboard)
             return
 
-        keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
-        await message.answer("Наступний модуль ще не відкрит:", reply_markup=keyboard)
-    else:
-        await message.answer("Пользователь не найден в базе данных.")
+        await check_modules()
 
-# async def check_modules():
-#     """Проверяет пользователей и открывает новый модуль, если прошло 15 дней."""
-#     users = await AsyncDB.get_all_users()  # Получаем всех пользователей
-#
-#     for user in users:
-#         if user.module_start_date and user.current_module < 6:
-#             days_passed = (datetime.now().date() - user.module_start_date).days
-#             if days_passed >= 15:
-#                 await AsyncDB.update_current_module(user.tel_id, user.current_module + 1)
-#                 await AsyncDB.set_module_start_date(user.tel_id)
-#
-#
+    if user.current_module >= 6:
+        await message.answer("Ви вже пройшли всі модулі.")
+        return
+
+
+async def check_modules():
+    """Проверяет пользователей и открывает новый модуль, если прошло 15 дней."""
+    users = await AsyncDB.get_all_users()  # Получаем всех пользователей
+
+    updated_users = []  # Список пользователей, которым обновим модуль
+
+    for user in users:
+        module_start_date = user.get("module_start_date")
+        current_module = user.get("current_module", 1)  # Если нет, то 1
+
+        if not module_start_date:
+            continue  # Пропускаем, если у пользователя нет даты старта
+
+        module_start_date = module_start_date.date() if isinstance(module_start_date, datetime) else module_start_date
+        days_passed = (datetime.now().date() - module_start_date).days
+
+        if days_passed >= 15:
+            new_module = current_module + 1
+            await AsyncDB.update_current_module(user["tel_id"], new_module)
+
+
 async def scheduler():
     while True:
-        await block_inactive_users()
-#         await check_modules()
+        await check_modules()
+#         await block_inactive_users()
+#
 #         await asyncio.sleep(86400)
 
 

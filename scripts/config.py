@@ -41,7 +41,31 @@ MODULES_TEMPLATE = {
             "2": None
         }
     },
-    "MODULE_2": {},
+    "MODULE_2": {
+        "lesson1": {
+            "1": None
+        },
+        "lesson2": {
+            "1": None,
+            "2": None
+        },
+        "lesson3": {
+            "1": None,
+            "2": None,
+            "3": None
+        },
+        "lesson4": {
+            "1": None,
+            "2": None
+        },
+        "lesson5": {
+            "1": None,
+            "2": None
+        },
+        "lesson6": {
+            "1": None
+        }
+    },
     "MODULE_3": {},
     "MODULE_4": {},
     "MODULE_5": {},

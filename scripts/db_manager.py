@@ -75,6 +75,15 @@ class AsyncDB:
                 return await cursor.fetchone()
 
     @staticmethod
+    async def get_module_start_date(tel_id: int):
+        query = "SELECT module_start_date FROM users WHERE tel_id = %s"
+        async with (await AsyncDB.get_connection()) as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cursor:
+                await cursor.execute(query, (tel_id,))
+                result = await cursor.fetchone()
+                return result["module_start_date"] if result and "module_start_date" in result else None
+
+    @staticmethod
     async def set_module_start_date(telegram_id: int):
         async with (await AsyncDB.get_connection()) as conn:
             async with conn.cursor() as cursor:
