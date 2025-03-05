@@ -335,47 +335,7 @@ async def block_inactive_users():
 import aiofiles
 
 
-# Примерная загрузка данных из файла (если FILE_PATH - путь к файлу)
-# def load_data_from_file(file_path):
-#     with open(file_path, 'r', encoding='utf-8') as file:
-#         return json.load(file)
-#
-#
-# # Теперь переменная FILE_PATH содержит данные в формате словаря, а не строки
-# FILE_PATH = load_data_from_file('D:\PythonProjects\Bot_M4\lessons.json')
-
 FILE_PATH = 'lessons.json'
-
-
-# async def get_lesson_data_json(module_id: int, lesson_id: int):
-#     """Получает данные об уроке по его ID и модулю из JSON."""
-#     try:
-#         async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
-#             content = await file.read()
-#             data = json.loads(content)
-#
-#         # Проверяем, есть ли список уроков в данных
-#         lessons = data.get("lessons")
-#         if not lessons:
-#             return None
-#
-#         # Ищем нужный урок по module_id и lesson_id
-#         lesson = next(
-#             (
-#                 lesson
-#                 for lesson in lessons
-#                 if lesson.get("module_id") == module_id and lesson.get("lesson_id") == lesson_id
-#             ),
-#             None,
-#         )
-#
-#         return lesson
-#
-#     except FileNotFoundError:
-#         print(f"Файл {FILE_PATH} не найден.")
-#     except json.JSONDecodeError:
-#         print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
-#     return None
 
 
 # Метод для получения текущего индекса видео по module_id и lesson_id
@@ -663,7 +623,6 @@ async def get_lesson_data_json(module_id: int, lesson_id: int):
     except json.JSONDecodeError:
         print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
     return None
-
 
 
 # # Обработчик для кнопки "Далі"

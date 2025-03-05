@@ -340,30 +340,48 @@ async def handle_module(message: Message):
 
     await AsyncDB.update_user_progress_module(tel_id, module_number)
 
-    current_module = await AsyncDB.get_user_progress_current_module(tel_id)
-    current_lesson = await AsyncDB.get_user_progress_current_lesson(tel_id)
-    if current_module == module_number:
-        lesson_data = await get_lesson_data_json(current_module, current_lesson)
+    current_module = await AsyncDB.get_user_current_module(tel_id)
+
+    select_module = await AsyncDB.get_user_progress_current_module(tel_id)
+    select_lesson = await AsyncDB.get_user_progress_current_lesson(tel_id)
+
+    if select_module == current_module:
+        update_current_lesson = await AsyncDB.update_current_lesson(tel_id, 1)
+        current_lesson = await AsyncDB.get_current_lesson(tel_id)
+        lesson_data = await get_lesson_data_json(current_module,  current_lesson)
+        print("lesson_data:", lesson_data)
         video_data = lesson_data["video_module"]
         # Получаем видео по текущему индексу
         video_to_send = video_data[0]
         await message.answer(f"{video_to_send['title1']}")
+        # Получаем пользователя из БД по telegram_id
+        user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
 
-    # Получаем пользователя из БД по telegram_id
-    user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
+        if user:
+            user = await AsyncDB.get_user(message.chat.id)
 
-    if user:
-        user = await AsyncDB.get_user(message.chat.id)
+            if not user:
+                await message.answer("Вы не зарегистрированы.")
+                return
 
-        if not user:
-            await message.answer("Вы не зарегистрированы.")
-            return
-
-        keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
-        await AsyncDB.check_module_score(tel_id, module_number)
-        await message.answer("Оберіть урок:", reply_markup=keyboard)
+            keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+            await message.answer("Выберите урок:", reply_markup=keyboard)
+        else:
+            await message.answer("Пользователь не найден в базе данных.")
     else:
-        await message.answer("Пользователь не найден в базе данных.")
+        user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
+
+        if user:
+            update_current_lesson = await AsyncDB.update_current_lesson(tel_id, 6)
+
+            user = await AsyncDB.get_user(message.chat.id)
+
+            if not user:
+                await message.answer("Вы не зарегистрированы.")
+                return
+
+            keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+            await message.answer("Выберите урок:", reply_markup=keyboard)
 
 
 # Обработчик для кнопки "Урок"
@@ -633,8 +651,6 @@ async def next_module(message: Message):
                                  reply_markup=keyboard)
             return
 
-        await check_modules()
-
     if user.current_module >= 6:
         await message.answer("Ви вже пройшли всі модулі.")
         return
@@ -661,9 +677,9 @@ async def check_modules():
             await AsyncDB.update_current_module(user["tel_id"], new_module)
 
 
-async def scheduler():
-    while True:
-        await check_modules()
+# async def scheduler():
+#     while True:
+#         await check_modules()
 #         await block_inactive_users()
 #
 #         await asyncio.sleep(86400)
@@ -677,6 +693,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
 try:
     asyncio.run(main())
-    asyncio.run(scheduler())
+    # asyncio.run(scheduler())
 except KeyboardInterrupt:
     print('Exit')
