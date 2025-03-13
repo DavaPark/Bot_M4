@@ -10,9 +10,9 @@ main_regicter_inline_markup = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='Відгуки', url='https://t.me/+FR1_yfv_z8kzOTli')],
     [InlineKeyboardButton(text='Програма', callback_data='program')],
     [InlineKeyboardButton(text='Навіщо тобі М4 Реді', callback_data='why_need')],
-    [InlineKeyboardButton(text='Сайт', url='https://t.me/+FR1_yfv_z8kzOTli')],
-    [InlineKeyboardButton(text='Телеграм канал М4 Реді', url='https://t.me/+FR1_yfv_z8kzOTli')],
-    [InlineKeyboardButton(text='Підтримка', url='https://t.me/+FR1_yfv_z8kzOTli')]
+    [InlineKeyboardButton(text='Сайт', url='https://m4europe.org/ukraine/')],
+    [InlineKeyboardButton(text='Телеграм канал М4 Реді', url='https://choko.link/M4Ukraine')],
+    [InlineKeyboardButton(text='Підтримка', url='https://t.me/m4_intensive')]
 ])
 
 
