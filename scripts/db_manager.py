@@ -281,6 +281,7 @@ class AsyncDB:
                     await conn.commit()
                     return
                 else:
+                    print(1234,result["progress"])
                     current_progress = dict(json.loads(result["progress"]))
                     if f'module{module_num}' not in current_progress:
                         current_progress[f"module{module_num}"] = MODULES_TEMPLATE[f"MODULE_{module_num}"]
