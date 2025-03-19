@@ -276,7 +276,7 @@ class AsyncDB:
                                         UPDATE user_progress
                                         SET progress = %s
                                         WHERE tel_id = %s
-                                    """, (str(json.dumps({f'module{module_num}': MODULES_TEMPLATE[f"MODULE_{module_num}"]})), tel_id))
+                                    """, (str(json.dumps({f'module{module_num}': str(json.dumps(MODULES_TEMPLATE[f"MODULE_{module_num}"]))})), tel_id))
 
                     await conn.commit()
                     return
@@ -285,7 +285,7 @@ class AsyncDB:
                     if f'module{module_num}' not in current_progress:
                         current_progress[f"module{module_num}"] = MODULES_TEMPLATE[f"MODULE_{module_num}"]
                         await cursor.execute("""UPDATE user_progress SET progress = %s WHERE tel_id = %s;""", (
-                        str(current_progress), tel_id))
+                        str(json.dumps(current_progress)), tel_id))
                         await conn.commit()
                         return
 
