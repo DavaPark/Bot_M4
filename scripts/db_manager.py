@@ -265,8 +265,8 @@ class AsyncDB:
         return None
 
     @staticmethod
-    async def check_module_score(tel_id, module_num):
-        conn = await AsyncDB.get_connection()  # Добавляем await
+    async def check_module_data(tel_id, module_num):
+        conn = await AsyncDB.get_connection()
         async with conn.cursor(aiomysql.DictCursor) as cursor:
             await cursor.execute(f"SELECT progress FROM user_progress WHERE tel_id={tel_id};")
             result = await cursor.fetchone()

@@ -387,12 +387,13 @@ async def study_how(message: Message):
 
 @dp.message(lambda message: message.text.startswith('Модуль'))
 async def handle_module(message: Message):
-    module_number = int(message.text.split(" ")[1])  # Получаем номер модуля
+    module_number = int(message.text.split(" ")[1])  #Получаем номер модуля
     tel_id = message.chat.id
 
     await AsyncDB.update_user_progress_module(tel_id, module_number)
 
     current_module = await AsyncDB.get_user_current_module(tel_id)
+    await AsyncDB.check_module_data(tel_id, module_number)
 
     select_module = await AsyncDB.get_user_progress_current_module(tel_id)
     select_lesson = await AsyncDB.get_user_progress_current_lesson(tel_id)

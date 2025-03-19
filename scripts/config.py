@@ -66,8 +66,109 @@ MODULES_TEMPLATE = {
             "1": None
         }
     },
-    "MODULE_3": {},
-    "MODULE_4": {},
-    "MODULE_5": {},
-    "MODULE_6": {},
+    "MODULE_3": {
+        "lesson1": {
+            "1": None,
+            "2": None
+        },
+        "lesson2": {
+            "1": None,
+            "2": None
+        },
+        "lesson3": {
+            "1": None,
+            "2": None
+        },
+        "lesson4": {
+            "1": None,
+            "2": None
+        },
+        "lesson5": {
+            "1": None,
+            "2": None
+        },
+        "lesson6": {
+            "1": None,
+            "2": None,
+            "3": None
+        }
+    },
+    "MODULE_4": {
+        "lesson1": {
+            "1": None,
+            "2": None,
+            "3": None,
+            "4": None
+        },
+        "lesson2": {
+            "1": None,
+            "2": None,
+            "3": None
+        },
+        "lesson3": {
+            "1": None,
+            "2": None
+        },
+        "lesson4": {
+            "1": None
+        },
+        "lesson5": {
+            "1": None,
+            "2": None
+        },
+        "lesson6": {
+            "1": None,
+            "2": None
+        }
+    },
+    "MODULE_5": {
+        "lesson1": {
+            "1": None,
+            "2": None
+        },
+        "lesson2": {
+            "1": None
+        },
+        "lesson3": {
+            "1": None
+        },
+        "lesson4": {
+            "1": None
+        },
+        "lesson5": {
+            "1": None
+        },
+        "lesson6": {
+            "1": None,
+            "2": None
+        }
+    },
+    "MODULE_6": {
+        "lesson1": {
+            "1": None,
+            "2": None,
+            "3": None
+        },
+        "lesson2": {
+            "1": None,
+            "2": None
+        },
+        "lesson3": {
+            "1": None,
+            "2": None,
+            "3": None
+        },
+        "lesson4": {
+            "1": None,
+            "2": None
+        },
+        "lesson5": {
+            "1": None
+        },
+        "lesson6": {
+            "1": None,
+            "2": None,
+            "3": None
+        }
+    },
 }
