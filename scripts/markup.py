@@ -97,6 +97,7 @@ def get_module_keyboard(current_module: int) -> ReplyKeyboardMarkup:
 
 
 def get_lesson_keyboard(current_lesson: int) -> ReplyKeyboardMarkup:
+    print(current_lesson)
     buttons = [[KeyboardButton(text=f"Урок {i}")] for i in range(1, current_lesson + 1)]
     buttons.append([KeyboardButton(text="🔙Модулі")])
 

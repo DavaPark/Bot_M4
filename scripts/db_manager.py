@@ -15,6 +15,30 @@ class AsyncDB:
         return await aiomysql.connect(**DB_CONFIG)
 
     @staticmethod
+    async def get_test_score(telegram_id: int, module: int, lesson: int, test: int):
+        conn = await AsyncDB.get_connection()
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute("SELECT progress FROM user_progress WHERE tel_id = %s", (telegram_id,))
+            result = await cursor.fetchone()
+
+            if result and result.get("progress"):
+                try:
+                    progress_raw = result["progress"]
+                    print(f"RAW Progress: {progress_raw}")  # Посмотрим, что в БД
+
+                    progress = json.loads(progress_raw.replace("'", '"'))  # Исправляем кавычки
+                    test_score = progress.get(f"module{module}", {}).get(f"lesson{lesson}", {}).get(str(test))
+
+                    print(f"Test Score: {test_score}")  # Выведем, что получилось
+                    return test_score
+                except json.JSONDecodeError as e:
+                    print(f"JSON Decode Error: {e}")  # Если ошибка парсинга
+                    return None
+
+        await conn.ensure_closed()
+        return None
+
+    @staticmethod
     async def get_user(telegram_id: int):
         conn = await AsyncDB.get_connection()  # Добавляем await
         async with conn.cursor(aiomysql.DictCursor) as cursor:
@@ -276,12 +300,11 @@ class AsyncDB:
                                         UPDATE user_progress
                                         SET progress = %s
                                         WHERE tel_id = %s
-                                    """, (str(json.dumps({f'module{module_num}': str(json.dumps(MODULES_TEMPLATE[f"MODULE_{module_num}"]))})), tel_id))
+                                    """, (str(json.dumps({f'module{module_num}': MODULES_TEMPLATE[f"MODULE_{module_num}"]})), tel_id))
 
                     await conn.commit()
                     return
                 else:
-                    print(1234,result["progress"])
                     current_progress = dict(json.loads(result["progress"]))
                     if f'module{module_num}' not in current_progress:
                         current_progress[f"module{module_num}"] = MODULES_TEMPLATE[f"MODULE_{module_num}"]
@@ -626,47 +649,3 @@ async def get_lesson_data_json(module_id: int, lesson_id: int):
     return None
 
 
-# # Обработчик для кнопки "Далі"
-# @dp.message(lambda message: message.text == 'Далі')
-# async def handle_next_button(message: Message):
-#     tel_id = message.from_user.id
-#     current_module = await AsyncDB.get_user_progress_current_module(tel_id)
-#
-#     # Получаем текущий урок пользователя
-#     current_lesson_data = await AsyncDB.get_user_progress_current_lesson(tel_id)
-#     # Получаем данные урока из JSON
-#     lesson_data = await get_lesson_data_json(current_module, current_lesson_data)
-#
-#     if not current_lesson_data:
-#         await message.answer("Урок не найден.")
-#         return
-#
-#     if not lesson_data:
-#         await message.answer("Урок не найден в базе данных.")
-#         return
-#
-#     # Получаем индекс текущего видео
-#     video_index = lesson_data['current_video_index']
-#
-#     # Проверяем, есть ли следующее видео
-#     if video_index < len(lesson_data['video']):
-#         # Получаем ссылку на следующее видео
-#         video_url = list(lesson_data['video'][video_index].values())[0]  # получаем ссылку на видео
-#         test_index = lesson_data['current_test_index']
-#         if test_index < len(lesson_data['test_links']):
-#             # Получаем ссылку на следующий тест
-#             test_url = list(lesson_data['test_links'][test_index].values())[0]  # получаем ссылку на тест
-#             # Создаем инлайн кнопку для теста
-#             test_button = InlineKeyboardButton(text="Пройти тест", url=test_url)
-#
-#             # Создаем инлайн клавиатуру
-#             lesson_keyboard = InlineKeyboardMarkup(inline_keyboard=[[test_button]])
-#             # Обновляем индекс видео для пользователя
-#             await update_current_video_index(current_module, current_lesson_data, video_index + 1)
-#             await message.answer_video(f"Смотрите видео: {video_url}",
-#                                        reply_markup=lesson_keyboard)
-#         else:
-#             await message.answer('Ви молодці!')
-#     else:
-#         await message.answer("Ви молодці приступайте до наступного уроку",
-#                              reply_markup=sm.get_next_lesson_keyboard())
