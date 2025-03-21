@@ -823,6 +823,7 @@ async def check_modules():
         days_passed = (datetime.now().date() - module_start_date).days
 
         if days_passed >= 15:
+            await bot.send_message("Открыт новый модуль")
             await AsyncDB.update_current_lesson(user["tel_id"], 1)
             new_module = current_module + 1
             await AsyncDB.update_current_module(user["tel_id"], new_module)
