@@ -530,7 +530,7 @@ async def handle_lesson(message: Message):
         test_score = await AsyncDB.get_test_score(tel_id, current_module, current_lesson, 1)
         print(test_score)
         # Если пользователь пытается перейти к уроку, который соответствует текущему уроку
-        if module_number == current_module and lesson_number == current_lesson and test_score == 0:
+        if module_number == current_module and lesson_number == current_lesson and test_score is None:
             await AsyncDB.update_user_progress_lesson(tel_id, lesson_number)
 
             lesson_data = await get_lesson_data_json(module_number, lesson_number)
