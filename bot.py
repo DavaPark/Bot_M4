@@ -21,8 +21,17 @@ import scripts.markup as sm
 from scripts.texts import *
 from scripts.way4pay import WayForPay
 
+import schedule
+
 bot = Bot(TOKEN_API, default=DefaultBotProperties(parse_mode="HTML"))
 dp = Dispatcher()
+
+
+async def check_user(tel_id):
+    user = await AsyncDB.get_user(tel_id)
+    if user is not None:
+        return user.is_blocked == 1
+    return False
 
 
 @dp.message(CommandStart())
@@ -434,8 +443,9 @@ async def study(message: Message):
     if not user:
         await message.answer("Вы не зарегистрированы.")
         return
-    keyboard = sm.get_module_keyboard(getattr(user, "current_module", 1) or 1)
-    await message.answer("Оберіть модуль:", reply_markup=keyboard)
+    if await check_user(message.chat.id):
+        keyboard = sm.get_module_keyboard(getattr(user, "current_module", 1) or 1)
+        await message.answer("Оберіть модуль:", reply_markup=keyboard)
 
 
 @dp.message(F.text == 'Як навчатися?')
@@ -447,78 +457,187 @@ async def study_how(message: Message):
 
 @dp.message(lambda message: message.text.startswith('Модуль'))
 async def handle_module(message: Message):
-    module_number = int(message.text.split(" ")[1])  #Получаем номер модуля
     tel_id = message.chat.id
+    if await check_user(message.chat.id):
+        module_number = int(message.text.split(" ")[1])  #Получаем номер модуля
 
-    await AsyncDB.update_user_progress_module(tel_id, module_number)
+        await AsyncDB.update_user_progress_module(tel_id, module_number)
 
-    current_module = await AsyncDB.get_user_current_module(tel_id)
-    await AsyncDB.check_module_data(tel_id, module_number)
+        current_module = await AsyncDB.get_user_current_module(tel_id)
+        await AsyncDB.check_module_data(tel_id, module_number)
 
-    select_module = await AsyncDB.get_user_progress_current_module(tel_id)
-    select_lesson = await AsyncDB.get_user_progress_current_lesson(tel_id)
+        select_module = await AsyncDB.get_user_progress_current_module(tel_id)
+        select_lesson = await AsyncDB.get_user_progress_current_lesson(tel_id)
 
-    if select_module == current_module:
-        # await AsyncDB.update_current_lesson(tel_id, 1)
-        current_lesson = await AsyncDB.get_current_lesson(tel_id)
-        lesson_data = await get_lesson_data_json(current_module,  current_lesson)
-        # print("lesson_data:", lesson_data)
-        video_data = lesson_data["video_module"]
-        # Получаем видео по текущему индексу
-        video_to_send = video_data[0]
-        await message.answer(f"{video_to_send['title1']}")
-        # Получаем пользователя из БД по telegram_id
-        user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
+        if select_module == current_module:
+            # await AsyncDB.update_current_lesson(tel_id, 1)
+            current_lesson = await AsyncDB.get_current_lesson(tel_id)
+            lesson_data = await get_lesson_data_json(current_module,  current_lesson)
+            # print("lesson_data:", lesson_data)
+            video_data = lesson_data["video_module"]
+            # Получаем видео по текущему индексу
+            video_to_send = video_data[0]
+            await message.answer(f"{video_to_send['title1']}")
+            # Получаем пользователя из БД по telegram_id
+            user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
 
-        if user:
-            user = await AsyncDB.get_user(message.chat.id)
+            if user:
+                user = await AsyncDB.get_user(message.chat.id)
 
-            if not user:
-                await message.answer("Вы не зарегистрированы.")
-                return
+                if not user:
+                    await message.answer("Вы не зарегистрированы.")
+                    return
 
-            keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
-            await message.answer("Выберите урок:", reply_markup=keyboard)
+                keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+                await message.answer("Выберите урок:", reply_markup=keyboard)
+            else:
+                await message.answer("Пользователь не найден в базе данных.")
         else:
-            await message.answer("Пользователь не найден в базе данных.")
-    else:
-        user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
+            user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
 
-        if user:
-            await AsyncDB.update_current_lesson(tel_id, 6)
+            if user:
+                await AsyncDB.update_current_lesson(tel_id, 6)
 
-            user = await AsyncDB.get_user(message.chat.id)
+                user = await AsyncDB.get_user(message.chat.id)
 
-            if not user:
-                await message.answer("Вы не зарегистрированы.")
-                return
+                if not user:
+                    await message.answer("Вы не зарегистрированы.")
+                    return
 
-            keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
-            await message.answer("Выберите урок:", reply_markup=keyboard)
+                keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+                await message.answer("Выберите урок:", reply_markup=keyboard)
 
 
 # Обработчик для кнопки "Урок"
 @dp.message(lambda message: message.text.startswith('Урок'))
 async def handle_lesson(message: Message):
-    lesson_number = int(message.text.split(" ")[1])  # Получаем номер урока
     tel_id = message.chat.id
-    module_number = await AsyncDB.get_user_progress_current_module(tel_id)
-    current_module = await AsyncDB.get_user_current_module(tel_id)
-    current_lesson = await AsyncDB.get_current_lesson(tel_id)  # Получаем текущий урок пользователя
-    await update_current_video_index_0(module_number, lesson_number)
-    await update_current_test_index_0(module_number, lesson_number)
-    current_video_index = await get_current_video_index(module_number, lesson_number)  # Получаем текущий индекс видео
-    curent_test_index = await get_current_test_index(module_number, lesson_number)
-    test_score = await AsyncDB.get_test_score(tel_id, current_module, current_lesson, 1)
-    print(test_score)
-    # Если пользователь пытается перейти к уроку, который соответствует текущему уроку
-    if module_number == current_module and lesson_number == current_lesson and test_score == 0:
-        await AsyncDB.update_user_progress_lesson(tel_id, lesson_number)
+    if await check_user(message.chat.id):
+        lesson_number = int(message.text.split(" ")[1])  # Получаем номер урока
+        module_number = await AsyncDB.get_user_progress_current_module(tel_id)
+        current_module = await AsyncDB.get_user_current_module(tel_id)
+        current_lesson = await AsyncDB.get_current_lesson(tel_id)  # Получаем текущий урок пользователя
+        await update_current_video_index_0(module_number, lesson_number)
+        await update_current_test_index_0(module_number, lesson_number)
+        current_video_index = await get_current_video_index(module_number, lesson_number)  # Получаем текущий индекс видео
+        curent_test_index = await get_current_test_index(module_number, lesson_number)
+        test_score = await AsyncDB.get_test_score(tel_id, current_module, current_lesson, 1)
+        print(test_score)
+        # Если пользователь пытается перейти к уроку, который соответствует текущему уроку
+        if module_number == current_module and lesson_number == current_lesson and test_score == 0:
+            await AsyncDB.update_user_progress_lesson(tel_id, lesson_number)
 
+            lesson_data = await get_lesson_data_json(module_number, lesson_number)
+
+            if lesson_data:
+                if "video" in lesson_data and len(lesson_data["video"]) > 0:
+                    video_data = lesson_data["video"]
+                    # Получаем видео по текущему индексу
+                    video_to_send = video_data[current_video_index]
+                    first_video_id = video_to_send.get("video_id")
+                    if first_video_id:
+                        # Создаём инлайн-кнопку с ссылкой на тест
+                        test_data = lesson_data.get("tests", [])
+                        if test_data:
+                            # Берем первую ссылку из списка тестов
+                            test_url = test_data[current_video_index]["url"]
+                            test_title = test_data[curent_test_index]["test_id"]
+                            inline_button = InlineKeyboardButton(text=f"{test_title}",
+                                                                 url=test_url)
+                            inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
+                                                                  callback_data="next_lesson_part")
+                            inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
+
+                            # Создаем реплай-кнопку для продолжения
+                            # next_button = KeyboardButton(text="Далі")
+                            # lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
+
+                            # Обновляем индекс видео для следующего раза
+                            next_video_index = current_video_index + 1
+                            await update_current_video_index(module_number, lesson_number, next_video_index)
+                            await update_current_test_index(module_number, lesson_number, next_video_index)
+
+                            # Отправляем видео с кнопкой
+                            await message.answer_video(
+                                video=first_video_id,
+                                caption=f'{lesson_data.get("title")}\n \n {video_to_send["title"]}',
+                                reply_markup=inline_keyboard
+                            )
+                            # await message.answer(f"{video_to_send['title']}",
+                            #                      reply_markup=lesson_keyboard_reply)
+
+                    else:
+                        await message.answer("ID видео отсутствует в данных.")
+                else:
+                    await message.answer("В уроке нет видео.")
+            else:
+                await message.answer("Не удалось найти данные об уроке.")
+        else:
+
+            number = 0
+            lesson_data = await get_lesson_data_json(module_number, lesson_number)
+            await message.answer(f'{lesson_data.get("title")}')
+
+            while number < len(lesson_data['video']):
+                video_data = lesson_data["video"]
+                # Получаем видео по текущему индексу
+                video_to_send = video_data[number]
+                video_id = video_to_send.get("video_id")
+
+                await message.answer_video(video_id,
+                                           caption=f"{video_to_send['title']}")
+                number += 1
+            else:
+                await message.answer("Ось усі відео з цього уроку.",
+                                     reply_markup=sm.lesson_back_buttons_keyboard)
+
+
+@dp.callback_query(F.data == 'next_lesson_part')
+async def front_of_menu(callback: CallbackQuery):
+    tel_id = callback.message.chat.id
+    if await check_user(tel_id):
+        _up_ = await AsyncDB.get_user_progress(tel_id)
+        up = dict(json.loads(_up_.progress))
+        module_number = _up_.select_module
+        lesson_number = _up_.select_lesson
+        current_video_index = await get_current_video_index(module_number, lesson_number)
+        curent_test_index = await get_current_test_index(module_number, lesson_number)
+        test_result = up[f"module{module_number}"][f"lesson{lesson_number}"][str(current_video_index)]
+        if test_result is not None:
+            if int(test_result) < 80:
+                lesson_data = await get_lesson_data_json(module_number, lesson_number)
+                test_data = lesson_data.get("tests", [])
+                test_url = test_data[current_video_index]["url"]
+                test_title = test_data[curent_test_index]["test_id"]
+                inline_button = InlineKeyboardButton(text=f"{test_title}",
+                                                     url=test_url)
+                inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
+                                                      callback_data="next_lesson_part")
+                inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
+                await bot.send_message(tel_id, failed_test, reply_markup=inline_keyboard)
+            else:
+                await handle_next_button(callback.message)  # переход дальше
+        else:
+            await bot.send_message(tel_id, test_not_passed)
+            return
+
+
+# Обработчик для кнопки "Далі"
+async def handle_next_button(message: Message):
+    tel_id = message.chat.id
+    if await check_user(tel_id):
+        module_number = await AsyncDB.get_user_progress_current_module(tel_id)
+        lesson_number = await AsyncDB.get_user_progress_current_lesson(tel_id)
+        # Получаем данные урока из JSON
         lesson_data = await get_lesson_data_json(module_number, lesson_number)
+        print(lesson_data)
+        # Получаем текущий индекс видео
+        current_video_index = await get_current_video_index(module_number, lesson_number)
+        curent_test_index = await get_current_test_index(module_number, lesson_number)
 
         if lesson_data:
-            if "video" in lesson_data and len(lesson_data["video"]) > 0:
+            print(current_video_index, len(lesson_data['video']))
+            if current_video_index < len(lesson_data['video']):
                 video_data = lesson_data["video"]
                 # Получаем видео по текущему индексу
                 video_to_send = video_data[current_video_index]
@@ -548,119 +667,29 @@ async def handle_lesson(message: Message):
                         # Отправляем видео с кнопкой
                         await message.answer_video(
                             video=first_video_id,
-                            caption=f'{lesson_data.get("title")}\n \n {video_to_send["title"]}',
+                            caption=f"{video_to_send['title']}",
                             reply_markup=inline_keyboard
                         )
                         # await message.answer(f"{video_to_send['title']}",
                         #                      reply_markup=lesson_keyboard_reply)
-
                 else:
-                    await message.answer("ID видео отсутствует в данных.")
+                    await message.answer("Ви молодці приступайте до наступного уроку",
+                                         reply_markup=sm.get_next_lesson_keyboard())
             else:
-                await message.answer("В уроке нет видео.")
-        else:
-            await message.answer("Не удалось найти данные об уроке.")
-    else:
-
-        number = 0
-        lesson_data = await get_lesson_data_json(module_number, lesson_number)
-        await message.answer(f'{lesson_data.get("title")}')
-
-        while number < len(lesson_data['video']):
-            video_data = lesson_data["video"]
-            # Получаем видео по текущему индексу
-            video_to_send = video_data[number]
-            video_id = video_to_send.get("video_id")
-
-            await message.answer_video(video_id,
-                                       caption=f"{video_to_send['title']}")
-            number += 1
-        else:
-            await message.answer("Ось усі відео з цього уроку.",
-                                 reply_markup=sm.lesson_back_buttons_keyboard)
-
-
-@dp.callback_query(F.data == 'next_lesson_part')
-async def front_of_menu(callback: CallbackQuery):
-    tel_id = callback.message.chat.id
-    _up_ = await AsyncDB.get_user_progress(tel_id)
-    up = dict(json.loads(_up_.progress))
-    module_number = _up_.select_module
-    lesson_number = _up_.select_lesson
-    current_video_index = await get_current_video_index(module_number, lesson_number)
-    curent_test_index = await get_current_test_index(module_number, lesson_number)
-    test_result = up[f"module{module_number}"][f"lesson{lesson_number}"][str(current_video_index)]
-    if test_result is not None:
-        if int(test_result) < 80:
-            lesson_data = await get_lesson_data_json(module_number, lesson_number)
-            test_data = lesson_data.get("tests", [])
-            test_url = test_data[current_video_index]["url"]
-            test_title = test_data[curent_test_index]["test_id"]
-            inline_button = InlineKeyboardButton(text=f"{test_title}",
-                                                 url=test_url)
-            inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
-                                                  callback_data="next_lesson_part")
-            inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
-            await bot.send_message(tel_id, failed_test, reply_markup=inline_keyboard)
-        else:
-            await handle_next_button(callback.message)  # переход дальше
-    else:
-        await bot.send_message(tel_id, test_not_passed)
-        return
-
-
-# Обработчик для кнопки "Далі"
-async def handle_next_button(message: Message):
-    tel_id = message.chat.id
-    module_number = await AsyncDB.get_user_progress_current_module(tel_id)
-    lesson_number = await AsyncDB.get_user_progress_current_lesson(tel_id)
-    # Получаем данные урока из JSON
-    lesson_data = await get_lesson_data_json(module_number, lesson_number)
-    print(lesson_data)
-    # Получаем текущий индекс видео
-    current_video_index = await get_current_video_index(module_number, lesson_number)
-    curent_test_index = await get_current_test_index(module_number, lesson_number)
-
-    if lesson_data:
-        print(current_video_index, len(lesson_data['video']))
-        if current_video_index < len(lesson_data['video']):
-            video_data = lesson_data["video"]
-            # Получаем видео по текущему индексу
-            video_to_send = video_data[current_video_index]
-            first_video_id = video_to_send.get("video_id")
-            if first_video_id:
-                # Создаём инлайн-кнопку с ссылкой на тест
-                test_data = lesson_data.get("tests", [])
-                if test_data:
-                    # Берем первую ссылку из списка тестов
-                    test_url = test_data[current_video_index]["url"]
-                    test_title = test_data[curent_test_index]["test_id"]
-                    inline_button = InlineKeyboardButton(text=f"{test_title}",
-                                                         url=test_url)
-                    inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
-                                                          callback_data="next_lesson_part")
-                    inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
-
-                    # Создаем реплай-кнопку для продолжения
-                    # next_button = KeyboardButton(text="Далі")
-                    # lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
-
-                    # Обновляем индекс видео для следующего раза
-                    next_video_index = current_video_index + 1
-                    await update_current_video_index(module_number, lesson_number, next_video_index)
-                    await update_current_test_index(module_number, lesson_number, next_video_index)
-
-                    # Отправляем видео с кнопкой
-                    await message.answer_video(
-                        video=first_video_id,
-                        caption=f"{video_to_send['title']}",
-                        reply_markup=inline_keyboard
-                    )
-                    # await message.answer(f"{video_to_send['title']}",
-                    #                      reply_markup=lesson_keyboard_reply)
-            else:
-                await message.answer("Ви молодці приступайте до наступного уроку",
-                                     reply_markup=sm.get_next_lesson_keyboard())
+                current_module = await AsyncDB.get_user_current_module(tel_id)
+                current_lesson = await AsyncDB.get_current_lesson(tel_id)
+                if current_lesson == 6:
+                    lesson_data = await get_lesson_data_json(current_module, current_lesson)
+                    video_data = lesson_data["video_module"]
+                    # Получаем видео по текущему индексу
+                    video_to_send = video_data[0]
+                    video_id = video_to_send.get("video_id")
+                    await message.answer_video(video_id,
+                                               caption=f"{video_to_send['title2']}",
+                                               reply_markup=sm.next_module_markup)
+                else:
+                    await message.answer("Ви молодці приступайте до наступного уроку",
+                                         reply_markup=sm.get_next_lesson_keyboard())
         else:
             current_module = await AsyncDB.get_user_current_module(tel_id)
             current_lesson = await AsyncDB.get_current_lesson(tel_id)
@@ -673,44 +702,30 @@ async def handle_next_button(message: Message):
                 await message.answer_video(video_id,
                                            caption=f"{video_to_send['title2']}",
                                            reply_markup=sm.next_module_markup)
-            else:
-                await message.answer("Ви молодці приступайте до наступного уроку",
-                                     reply_markup=sm.get_next_lesson_keyboard())
-    else:
-        current_module = await AsyncDB.get_user_current_module(tel_id)
-        current_lesson = await AsyncDB.get_current_lesson(tel_id)
-        if current_lesson == 6:
-            lesson_data = await get_lesson_data_json(current_module, current_lesson)
-            video_data = lesson_data["video_module"]
-            # Получаем видео по текущему индексу
-            video_to_send = video_data[0]
-            video_id = video_to_send.get("video_id")
-            await message.answer_video(video_id,
-                                       caption=f"{video_to_send['title2']}",
-                                       reply_markup=sm.next_module_markup)
 
 
 @dp.message(lambda message: message.text == "Наступний урок")
 async def handle_next_lesson(message: Message):
     tel_id = message.chat.id
-    current_lesson = await AsyncDB.get_current_lesson(tel_id)
-    next_lesson = current_lesson + 1
+    if await check_user(tel_id):
+        current_lesson = await AsyncDB.get_current_lesson(tel_id)
+        next_lesson = current_lesson + 1
 
-    # Проверяем, что пользователь не пытается перейти на урок, который он уже прошел
-    if current_lesson is not None and current_lesson <= 6:  # Например, у нас 6 уроков
-        await AsyncDB.update_current_lesson(tel_id, next_lesson)
-        await message.answer(f"Ви перейшли на {next_lesson}-й урок. Успіхів у навчанні!")
+        # Проверяем, что пользователь не пытается перейти на урок, который он уже прошел
+        if current_lesson is not None and current_lesson <= 6:  # Например, у нас 6 уроков
+            await AsyncDB.update_current_lesson(tel_id, next_lesson)
+            await message.answer(f"Ви перейшли на {next_lesson}-й урок. Успіхів у навчанні!")
 
-        # Получаем информацию о пользователе для отправки следующих уроков
-        user = await AsyncDB.get_user_by_telegram_id(tel_id)
-        if user:
-            # Отправляем клавиатуру с новым уроком
-            keyboard = get_lesson_keyboard(next_lesson)
-            await message.answer("Оберіть урок:", reply_markup=keyboard)
+            # Получаем информацию о пользователе для отправки следующих уроков
+            user = await AsyncDB.get_user_by_telegram_id(tel_id)
+            if user:
+                # Отправляем клавиатуру с новым уроком
+                keyboard = get_lesson_keyboard(next_lesson)
+                await message.answer("Оберіть урок:", reply_markup=keyboard)
+            else:
+                await message.answer("Пользователь не найден в базе данных.")
         else:
-            await message.answer("Пользователь не найден в базе данных.")
-    else:
-        await message.answer("Поздравляем, вы завершили все уроки этого модуля!")
+            await message.answer("Поздравляем, вы завершили все уроки этого модуля!")
 
 
 @dp.message(F.text == "Повернутися до уроків")
@@ -757,53 +772,53 @@ async def back_to_lessons(message: Message):
 async def next_module(message: Message):
     user = await AsyncDB.get_user(message.chat.id)
     tel_id = message.chat.id
-
-    if user.current_module == 6:
-        current_module = await AsyncDB.get_user_current_module(tel_id)
-        new_module = current_module + 1
-        await AsyncDB.update_current_module(tel_id, new_module)
-        video_id = "BAACAgIAAxkBAAIKr2fbLs92cFT61alfPcdV9KLzlNjVAAKtagAC7vzhSpe4NvrqYX35NgQ"
-        await message.answer_video(video_id,
-                                   caption="<b>Вітаємо!</b> 🎉 "
-                                           "\n\nТи пройшов важливий шлях, отримав нові знання та навички, розкрив своє"
-                                           " покликання у Божій історії. Незалежно від того, ким ти себе бачиш – <b>"
-                                           "засновником церкви, частиною команди або лідером у своїй громаді,</b> "
-                                           "– тепер ти <b>готовий діяти.</b>"
-                                           "\n\n💡 <b>Що далі?</b>"
-                                           "\n ✅ Використовуй усе, що дізнався – у своїй церкві, служінні, команді,"
-                                           " сім’ї."
-                                           "\n ✅ Відчуваєш поклик до заснування церкви? <b>Не зволікай!</b>"
-                                           " Зроби перший крок!"
-                                           "\n ✅ Залишайся на зв’язку з нашою командою, приєднуйся до спільноти та"
-                                           " конференцій."
-                                           "\n\n🎁<b>Маємо подарунок для тебе!</b>"
-                                           "\nЩоб отримати <b>сертифікат</b> про завершення курсу та <b>особливий"
-                                           " подарунок</b> від нас, напиши в чат підтримки!"
-                                           "\n\n🙏 <b>Ми молимося за тебе і благословляємо твій шлях!</b> Нехай Бог"
-                                           " веде тебе у твоєму покликанні, а ти <b>рухайся вперед із вірою та"
-                                           " впевненістю!</b>"
-                                           "\n\n<b>Ти круто попрацював – тепер час діяти!</b> 🚀🔥",
-                                   reply_markup=sm.menu_buttons_keyboard)
-        return
-
-    module_start_date = await AsyncDB.get_module_start_date(message.chat.id)
-
-    if not user:
-        await message.answer("Вы не зарегистрированы.")
-        return
-
-    if module_start_date:
-        module_start_date = module_start_date.date() if isinstance(module_start_date, datetime) else module_start_date
-        days_passed = (datetime.now().date() - module_start_date).days
-        days_left = 15 - days_passed
-
-        if days_passed < 15:
-            keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
-            await message.answer(f"Наступний модуль буде відкрито через {days_left} днів.",
-                                 reply_markup=keyboard)
+    if await check_user(tel_id):
+        if user.current_module == 6:
+            current_module = await AsyncDB.get_user_current_module(tel_id)
+            new_module = current_module + 1
+            await AsyncDB.update_current_module(tel_id, new_module)
+            video_id = "BAACAgIAAxkBAAIKr2fbLs92cFT61alfPcdV9KLzlNjVAAKtagAC7vzhSpe4NvrqYX35NgQ"
+            await message.answer_video(video_id,
+                                       caption="<b>Вітаємо!</b> 🎉 "
+                                               "\n\nТи пройшов важливий шлях, отримав нові знання та навички, розкрив своє"
+                                               " покликання у Божій історії. Незалежно від того, ким ти себе бачиш – <b>"
+                                               "засновником церкви, частиною команди або лідером у своїй громаді,</b> "
+                                               "– тепер ти <b>готовий діяти.</b>"
+                                               "\n\n💡 <b>Що далі?</b>"
+                                               "\n ✅ Використовуй усе, що дізнався – у своїй церкві, служінні, команді,"
+                                               " сім’ї."
+                                               "\n ✅ Відчуваєш поклик до заснування церкви? <b>Не зволікай!</b>"
+                                               " Зроби перший крок!"
+                                               "\n ✅ Залишайся на зв’язку з нашою командою, приєднуйся до спільноти та"
+                                               " конференцій."
+                                               "\n\n🎁<b>Маємо подарунок для тебе!</b>"
+                                               "\nЩоб отримати <b>сертифікат</b> про завершення курсу та <b>особливий"
+                                               " подарунок</b> від нас, напиши в чат підтримки!"
+                                               "\n\n🙏 <b>Ми молимося за тебе і благословляємо твій шлях!</b> Нехай Бог"
+                                               " веде тебе у твоєму покликанні, а ти <b>рухайся вперед із вірою та"
+                                               " впевненістю!</b>"
+                                               "\n\n<b>Ти круто попрацював – тепер час діяти!</b> 🚀🔥",
+                                       reply_markup=sm.menu_buttons_keyboard)
             return
-        else:
-            await message.answer("ger")
+
+        module_start_date = await AsyncDB.get_module_start_date(message.chat.id)
+
+        if not user:
+            await message.answer("Вы не зарегистрированы.")
+            return
+
+        if module_start_date:
+            module_start_date = module_start_date.date() if isinstance(module_start_date, datetime) else module_start_date
+            days_passed = (datetime.now().date() - module_start_date).days
+            days_left = 15 - days_passed
+
+            if days_passed < 15:
+                keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+                await message.answer(f"Наступний модуль буде відкрито через {days_left} днів.",
+                                     reply_markup=keyboard)
+                return
+            else:
+                await message.answer("ger")
 
 
 async def check_modules():
@@ -828,16 +843,20 @@ async def check_modules():
             await AsyncDB.update_current_module(user["tel_id"], new_module)
 
 
-async def scheduler():
-    while True:
-        await check_modules()
-#         await block_inactive_users()
-#
-        await asyncio.sleep(10)
+# async def scheduler():
+#     while True:
+#         await check_modules()
+# #         await block_inactive_users()
+# #
+#         await asyncio.sleep(10)
 
 
 async def main():
-    asyncio.create_task(scheduler())
+
+    schedule.every().day.at("04:00").do(check_modules)
+    schedule.every().day.at("04:00").do(block_inactive_users)
+
+    # asyncio.create_task(scheduler())
     await dp.start_polling(bot)
 
 

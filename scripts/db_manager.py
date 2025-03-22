@@ -348,8 +348,8 @@ async def block_inactive_users():
         async with conn.cursor() as cursor:
             await cursor.execute("""
                 UPDATE users 
-                SET is_blocked = TRUE 
-                WHERE DATEDIFF(NOW(), last_date) > 14
+                SET is_blocked = 1 
+                WHERE DATEDIFF(NOW(), last_date) > 15
             """)
             await conn.commit()
 
