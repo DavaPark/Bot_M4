@@ -10,7 +10,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, \
     KeyboardButton, ReplyKeyboardMarkup
-from scripts.config import TOKEN_API, W4P_KEY, DOMAIN_NAME, MERCHANT_ACCOUNT
+from scripts.config import TOKEN_API, W4P_KEY, DOMAIN_NAME, MERCHANT_ACCOUNT, AMOUNT
 from scripts.db_manager import AsyncDB, block_inactive_users, \
     get_lesson_data_json, update_current_video_index, update_current_test_index, update_current_video_index_0, \
     get_current_video_index, update_current_test_index_0, get_current_test_index
@@ -301,10 +301,10 @@ async def check_registration_form(callback: CallbackQuery):
                 res = wfp.create_invoice(
                     merchantAccount=MERCHANT_ACCOUNT,
                     merchantAuthType='SimpleSignature',
-                    amount='500',
+                    amount=f'{AMOUNT}',
                     currency='UAH',
                     productNames=["Оплата за курс M4"],
-                    productPrices=[500],
+                    productPrices=[AMOUNT],
                     productCounts=[1],
                     orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 1}"
                 )
@@ -312,10 +312,10 @@ async def check_registration_form(callback: CallbackQuery):
                     res = wfp.create_invoice(
                         merchantAccount=MERCHANT_ACCOUNT,
                         merchantAuthType='SimpleSignature',
-                        amount='500',
+                        amount=f'{AMOUNT}',
                         currency='UAH',
                         productNames=["Оплата за курс M4"],
-                        productPrices=[500],
+                        productPrices=[AMOUNT],
                         productCounts=[1],
                         orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 2}"
                     )
