@@ -54,14 +54,19 @@ def pay_keyb(link):
     ])
 
 
-menu_buttons_keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Навчання 📚"), KeyboardButton(text="Публічний договір")],
-        [KeyboardButton(text="Спільнота"), KeyboardButton(text="Питання-відповіді")],
-        [KeyboardButton(text="Корисне"), KeyboardButton(text="Підтримка")],
-    ],
-    resize_keyboard=True
-)
+def main_menu(is_admin):
+    kb = [
+            [KeyboardButton(text="Навчання 📚"), KeyboardButton(text="Публічний договір")],
+            [KeyboardButton(text="Спільнота"), KeyboardButton(text="Питання-відповіді")],
+            [KeyboardButton(text="Корисне"), KeyboardButton(text="Підтримка")],
+        ]
+    # if is_admin:
+    #     kb.append([KeyboardButton(text="ADMIN")])
+    return ReplyKeyboardMarkup(
+        keyboard=kb,
+        resize_keyboard=True
+    )
+
 
 back_buttons_keyboard = ReplyKeyboardMarkup(
     keyboard=[

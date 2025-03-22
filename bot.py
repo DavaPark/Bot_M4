@@ -14,7 +14,7 @@ from scripts.config import TOKEN_API, W4P_KEY, DOMAIN_NAME, MERCHANT_ACCOUNT, AM
 from scripts.db_manager import AsyncDB, block_inactive_users, \
     get_lesson_data_json, update_current_video_index, update_current_test_index, update_current_video_index_0, \
     get_current_video_index, update_current_test_index_0, get_current_test_index
-from datetime import datetime
+from datetime import datetime, date
 from scripts.markup import get_lesson_keyboard
 
 import scripts.markup as sm
@@ -30,7 +30,11 @@ dp = Dispatcher()
 async def check_user(tel_id):
     user = await AsyncDB.get_user(tel_id)
     if user is not None:
-        return user.is_blocked == 1
+        if user.is_blocked == 1:
+            await bot.send_message(tel_id, text=block_text)
+            return False
+        else:
+            return True
     return False
 
 
@@ -38,6 +42,7 @@ async def check_user(tel_id):
 async def cmd_start(message: Message):
     await AsyncDB.update_user(message.chat.id, last_date=datetime.now().date())
     existing_user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
+    user = await AsyncDB.get_user(message.chat.id)
     if existing_user:
         video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
         await message.answer_video(video_id,
@@ -52,7 +57,7 @@ async def cmd_start(message: Message):
                                            "\n✅ Будь активним у навчанні, став запитання та взаємодій зі спільнотою."
                                            "\n\n💡 <b>Досліди меню, щоб легко орієнтуватися та рухатися вперед!</b>"
                                            "\n\n🎯 <b>Ти готовий? Починай навчання вже зараз!</b>",
-                                   reply_markup=sm.menu_buttons_keyboard)
+                                   reply_markup=sm.main_menu(user.is_admin))
     else:
 
         video_id = "BAACAgIAAxkBAAIGxGfRd09oFFHdKjc5l7m9VhCbdXLiAAKxbAACX0WISu39lxhxZ-NBNgQ"
@@ -272,6 +277,7 @@ async def front_of_menu(callback: CallbackQuery):
     # при успешной оплате
     video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
     await callback.answer()
+    user = await AsyncDB.get_user(callback.message.chat.id)
     await callback.message.answer_video(video_id,
                                         caption="🎉 <b>Вітаємо на навчанні!</b>\n"
                                                 "\nТи зробив важливий крок, і ми раді вітати тебе у цій подорожі!"
@@ -285,7 +291,7 @@ async def front_of_menu(callback: CallbackQuery):
                                                 " спільнотою."
                                                 "\n\n💡 <b>Досліди меню, щоб легко орієнтуватися та рухатися вперед!</b>"
                                                 "\n\n🎯 <b>Ти готовий? Починай навчання вже зараз!</b>",
-                                        reply_markup=sm.menu_buttons_keyboard)
+                                        reply_markup=sm.main_menu(user.is_admin))
 
 
 @dp.callback_query(F.data == 'check_registration_form')
@@ -618,7 +624,9 @@ async def front_of_menu(callback: CallbackQuery):
             else:
                 await handle_next_button(callback.message)  # переход дальше
         else:
-            await bot.send_message(tel_id, test_not_passed)
+            user = await AsyncDB.get_user(tel_id)
+            text = test_not_passed.replace('%s', user.email)
+            await bot.send_message(tel_id, text=text)
             return
 
 
@@ -749,6 +757,7 @@ async def back_to_lessons(message: Message):
 @dp.message(F.text == "Головне меню")
 async def back_to_lessons(message: Message):
     video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
+    user = await AsyncDB.get_user(message.chat.id)
     await message.answer_video(video_id,
                                caption="🎉 <b>Вітаємо на навчанні!</b>\n"
                                  "\nТи зробив важливий крок, і ми раді вітати тебе у цій подорожі! Відкритість до нового – це ключ до зростання. Цей курс допоможе тобі розкрити своє покликання та використати знання для служіння."
@@ -758,7 +767,7 @@ async def back_to_lessons(message: Message):
                                  "\n✅ Будь активним у навчанні, став запитання та взаємодій зі спільнотою."
                                  "\n\n💡 <b>Досліди меню, щоб легко орієнтуватися та рухатися вперед!</b>"
                                  "\n\n🎯 <b>Ти готовий? Починай навчання вже зараз!</b>",
-                               reply_markup=sm.menu_buttons_keyboard)
+                               reply_markup=sm.main_menu(user.is_admin))
 
 
 @dp.message(F.text == "🔙Модулі")
@@ -798,7 +807,7 @@ async def next_module(message: Message):
                                                " веде тебе у твоєму покликанні, а ти <b>рухайся вперед із вірою та"
                                                " впевненістю!</b>"
                                                "\n\n<b>Ти круто попрацював – тепер час діяти!</b> 🚀🔥",
-                                       reply_markup=sm.menu_buttons_keyboard)
+                                       reply_markup=sm.main_menu(user.is_admin))
             return
 
         module_start_date = await AsyncDB.get_module_start_date(message.chat.id)
@@ -819,6 +828,14 @@ async def next_module(message: Message):
                 return
             else:
                 await message.answer("ger")
+
+
+# @dp.message(F.text == "ADMIN")
+# async def next_module(message: Message):
+#     tel_id = message.chat.id
+#     user = await AsyncDB.get_user(tel_id)
+#     if user.is_admin == 1:
+
 
 
 async def check_modules():
@@ -843,26 +860,53 @@ async def check_modules():
             await AsyncDB.update_current_module(user["tel_id"], new_module)
 
 
-# async def scheduler():
-#     while True:
-#         await check_modules()
-# #         await block_inactive_users()
-# #
-#         await asyncio.sleep(10)
+async def daily_texts():
+    """Рассылка ежедневных каких-то сообщений """
+    users = await AsyncDB.get_all_users_in_model()
+    for user in users:
+        if user.is_blocked != 1:
+            if user.current_module >= 1:
+                module_date = datetime.strptime(str(user.module_start_date),
+                                                "%Y-%m-%d %H:%M:%S").date()  # Получаем только дату
+                today = date.today()  # Текущая дата
+                days_difference = (today - module_date).days  # разница дат
+                if days_difference in {2, 4, 6, 8, 10, 12, 14}:
+                    text = MODULES_TEXTS[f"module{user.current_module}"][str(int(days_difference/2))]
+                    await bot.send_message(user.tel_id, text=text, disable_notification=True)
+
+
+def block_inactive_users_sync():
+    loop = asyncio.get_running_loop()
+    loop.create_task(block_inactive_users())
+
+
+def check_modules_sync():
+    loop = asyncio.get_running_loop()
+    loop.create_task(check_modules())
+
+
+def daily_texts_sync():
+    loop = asyncio.get_running_loop()
+    loop.create_task(daily_texts())
+
+
+async def scheduler():
+    while True:
+        schedule.run_pending()
+        await asyncio.sleep(60)
 
 
 async def main():
+    schedule.every().day.at("03:59").do(block_inactive_users_sync)
+    schedule.every().day.at("04:09").do(check_modules_sync)
+    schedule.every().day.at("04:19").do(daily_texts_sync)
 
-    schedule.every().day.at("04:00").do(check_modules)
-    schedule.every().day.at("04:00").do(block_inactive_users)
-
-    # asyncio.create_task(scheduler())
+    asyncio.create_task(scheduler())
     await dp.start_polling(bot)
-
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-try:
-    asyncio.run(main())
-except KeyboardInterrupt:
-    print('Exit')
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print('Exit')

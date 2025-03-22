@@ -60,6 +60,17 @@ class AsyncDB:
                 return await cursor.fetchall()
 
     @staticmethod
+    async def get_all_users_in_model():
+        async with (await AsyncDB.get_connection()) as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cursor:
+                await cursor.execute("SELECT * FROM users")
+                users = await cursor.fetchall()
+                res = []
+                for result in users:
+                    result.pop("id", None)
+                    res.append(User(**result))
+                return res
+    @staticmethod
     async def user_exists(telegram_id: int):
         return bool(await AsyncDB.get_user(telegram_id))
 
@@ -349,7 +360,7 @@ async def block_inactive_users():
             await cursor.execute("""
                 UPDATE users 
                 SET is_blocked = 1 
-                WHERE DATEDIFF(NOW(), last_date) > 15
+                WHERE DATEDIFF(NOW(), last_date) > 15 AND id_admin=0
             """)
             await conn.commit()
 
