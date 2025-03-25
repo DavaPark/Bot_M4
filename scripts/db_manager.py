@@ -39,6 +39,33 @@ class AsyncDB:
         return None
 
     @staticmethod
+    async def get_all_test_scores(telegram_id: int, module: int, lesson: int):
+        conn = await AsyncDB.get_connection()
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute("SELECT progress FROM user_progress WHERE tel_id = %s", (telegram_id,))
+            result = await cursor.fetchone()
+
+            if result and result.get("progress"):
+                try:
+                    progress_raw = result["progress"]
+                    print(f"RAW Progress: {progress_raw}")  # Отладочный вывод
+
+                    progress = json.loads(progress_raw.replace("'", '"'))  # Исправляем кавычки
+                    lesson_progress = progress.get(f"module{module}", {}).get(f"lesson{lesson}", {})
+
+                    test_scores = [lesson_progress.get(str(test_id)) for test_id in
+                                   sorted(lesson_progress.keys(), key=int)]
+
+                    print(f"Test Scores: {test_scores}")  # Выведем, что получилось
+                    return test_scores
+                except json.JSONDecodeError as e:
+                    print(f"JSON Decode Error: {e}")  # Ошибка парсинга JSON
+                    return []
+
+        await conn.ensure_closed()
+        return []
+
+    @staticmethod
     async def get_user(telegram_id: int):
         conn = await AsyncDB.get_connection()  # Добавляем await
         async with conn.cursor(aiomysql.DictCursor) as cursor:

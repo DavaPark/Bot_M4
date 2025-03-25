@@ -527,10 +527,15 @@ async def handle_lesson(message: Message):
         await update_current_test_index_0(module_number, lesson_number)
         current_video_index = await get_current_video_index(module_number, lesson_number)  # Получаем текущий индекс видео
         curent_test_index = await get_current_test_index(module_number, lesson_number)
-        test_score = await AsyncDB.get_test_score(tel_id, current_module, current_lesson, 1)
-        print(test_score)
+
+
+        test_scores = await AsyncDB.get_all_test_scores(tel_id, current_module, current_lesson)
+        print(test_scores)  # Например: [None, 85, 90]  (первый тест не пройден)
+
+        unfinished_tests = any(score is None for score in test_scores)  # True, если есть непройденные тесты
+
         # Если пользователь пытается перейти к уроку, который соответствует текущему уроку
-        if module_number == current_module and lesson_number == current_lesson and test_score is None:
+        if module_number == current_module and lesson_number == current_lesson and unfinished_tests == True:
             await AsyncDB.update_user_progress_lesson(tel_id, lesson_number)
 
             lesson_data = await get_lesson_data_json(module_number, lesson_number)
