@@ -80,6 +80,11 @@ lesson_back_buttons_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+lesson_6_back_buttons_keyboard = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Повернутися до уроків🔙")]],
+    resize_keyboard=True
+)
+
 module_back_buttons_keyboard = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="🔙Модулі")]],
     resize_keyboard=True

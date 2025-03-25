@@ -502,7 +502,7 @@ async def handle_module(message: Message):
             user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
 
             if user:
-                await AsyncDB.update_current_lesson(tel_id, 6)
+                # await AsyncDB.update_current_lesson(tel_id, 6)
 
                 user = await AsyncDB.get_user(message.chat.id)
 
@@ -510,7 +510,7 @@ async def handle_module(message: Message):
                     await message.answer("Вы не зарегистрированы.")
                     return
 
-                keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
+                keyboard = get_lesson_keyboard(6)
                 await message.answer("Выберите урок:", reply_markup=keyboard)
 
 
@@ -584,23 +584,58 @@ async def handle_lesson(message: Message):
             else:
                 await message.answer("Не удалось найти данные об уроке.")
         else:
+            if module_number == current_module:
+                number = 0
+                lesson_data = await get_lesson_data_json(module_number, lesson_number)
+                await message.answer(f'{lesson_data.get("title")}')
 
-            number = 0
-            lesson_data = await get_lesson_data_json(module_number, lesson_number)
-            await message.answer(f'{lesson_data.get("title")}')
+                while number < len(lesson_data['video']):
+                    video_data = lesson_data["video"]
+                    # Получаем видео по текущему индексу
+                    video_to_send = video_data[number]
+                    video_id = video_to_send.get("video_id")
 
-            while number < len(lesson_data['video']):
-                video_data = lesson_data["video"]
-                # Получаем видео по текущему индексу
-                video_to_send = video_data[number]
-                video_id = video_to_send.get("video_id")
-
-                await message.answer_video(video_id,
-                                           caption=f"{video_to_send['title']}")
-                number += 1
+                    await message.answer_video(video_id,
+                                               caption=f"{video_to_send['title']}")
+                    number += 1
+                else:
+                    await message.answer("Ось усі відео з цього уроку.",
+                                         reply_markup=sm.lesson_back_buttons_keyboard)
             else:
-                await message.answer("Ось усі відео з цього уроку.",
-                                     reply_markup=sm.lesson_back_buttons_keyboard)
+                number = 0
+                lesson_data = await get_lesson_data_json(module_number, lesson_number)
+                await message.answer(f'{lesson_data.get("title")}')
+
+                while number < len(lesson_data['video']):
+                    video_data = lesson_data["video"]
+                    # Получаем видео по текущему индексу
+                    video_to_send = video_data[number]
+                    video_id = video_to_send.get("video_id")
+
+                    await message.answer_video(video_id,
+                                               caption=f"{video_to_send['title']}")
+                    number += 1
+                else:
+                    await message.answer("Ось усі відео з цього уроку.",
+                                         reply_markup=sm.lesson_6_back_buttons_keyboard)
+
+
+@dp.message(F.text == "Повернутися до уроків🔙")
+async def back_to_lessons(message: Message):
+    # Получаем пользователя из БД по telegram_id
+    user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
+
+    if user:
+        user = await AsyncDB.get_user(message.chat.id)
+
+        if not user:
+            await message.answer("Вы не зарегистрированы.")
+            return
+
+        keyboard = get_lesson_keyboard(6)
+        await message.answer("Оберіть урок:", reply_markup=keyboard)
+    else:
+        await message.answer("Пользователь не найден в базе данных.")
 
 
 @dp.callback_query(F.data == 'next_lesson_part')
