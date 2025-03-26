@@ -515,7 +515,7 @@ async def handle_module(message: Message):
 
 
 # Обработчик для кнопки "Урок"
-@dp.message(lambda message: message.text.startswith('Урок'))
+@dp.message(lambda message: message.text.startswith('Урок1'))
 async def handle_lesson(message: Message):
     tel_id = message.chat.id
     if await check_user(message.chat.id):
@@ -583,6 +583,106 @@ async def handle_lesson(message: Message):
                     await message.answer("В уроке нет видео.")
             else:
                 await message.answer("Не удалось найти данные об уроке.")
+        else:
+            if module_number == current_module:
+                number = 0
+                lesson_data = await get_lesson_data_json(module_number, lesson_number)
+                await message.answer(f'{lesson_data.get("title")}')
+
+                while number < len(lesson_data['video']):
+                    video_data = lesson_data["video"]
+                    # Получаем видео по текущему индексу
+                    video_to_send = video_data[number]
+                    video_id = video_to_send.get("video_id")
+
+                    await message.answer_video(video_id,
+                                               caption=f"{video_to_send['title']}")
+                    number += 1
+                else:
+                    await message.answer("Ось усі відео з цього уроку.",
+                                         reply_markup=sm.lesson_back_buttons_keyboard)
+            else:
+                number = 0
+                lesson_data = await get_lesson_data_json(module_number, lesson_number)
+                await message.answer(f'{lesson_data.get("title")}')
+
+                while number < len(lesson_data['video']):
+                    video_data = lesson_data["video"]
+                    # Получаем видео по текущему индексу
+                    video_to_send = video_data[number]
+                    video_id = video_to_send.get("video_id")
+
+                    await message.answer_video(video_id,
+                                               caption=f"{video_to_send['title']}")
+                    number += 1
+                else:
+                    await message.answer("Ось усі відео з цього уроку."),
+
+
+
+# Обработчик для кнопки "Урок"
+@dp.message(lambda message: message.text.startswith('Урок'))
+async def handle_lesson(message: Message):
+    if await check_user(message.chat.id):
+        tel_id = message.chat.id
+
+        # Получаем номер модуля и текущего урока пользователя
+        lesson_number = int(message.text.split(" ")[1])
+        module_number = await AsyncDB.get_user_progress_current_module(tel_id)
+        current_module = await AsyncDB.get_user_current_module(tel_id)
+        current_lesson = await AsyncDB.get_current_lesson(tel_id)
+        current_video_index = await get_current_video_index(module_number,
+                                                            lesson_number)  # Получаем текущий индекс видео
+        curent_test_index = await get_current_test_index(module_number, lesson_number)
+
+        # Получаем пройденные тесты
+        test_scores = await AsyncDB.get_all_test_scores(tel_id, current_module, current_lesson)
+
+        # Определяем первый НЕПРОЙДЕННЫЙ тест
+        first_unfinished_index = next((i for i, score in enumerate(test_scores) if score is None), len(test_scores))
+
+        # Загружаем данные урока
+        lesson_data = await get_lesson_data_json(module_number, lesson_number)
+
+        if "video" in lesson_data and len(lesson_data["video"]) > 0:
+            video_data = lesson_data["video"]
+            test_data = lesson_data.get("tests", [])
+            # Получаем видео по текущему индексу
+            video_to_send = video_data[current_video_index]
+            first_video_id = video_to_send.get("video_id")
+
+            # Отправляем видео и тесты ПО ОЧЕРЕДИ
+            for i, video in enumerate(video_data):
+                video_id = video.get("video_id")
+                video_title = video.get("title")
+
+                if i < first_unfinished_index:  # Если тест пройден → показываем без теста
+                    await message.answer_video(
+                        video=video_id,
+                        caption=f'{lesson_data.get("title")}\n\n{video_title}'
+                    )
+                else:  # Если тест НЕ пройден → показываем с тестом
+                    if test_data and i < len(test_data):
+                        # Берем первую ссылку из списка тестов
+                        test_url = test_data[current_video_index]["url"]
+                        test_title = test_data[curent_test_index]["test_id"]
+                        inline_button = InlineKeyboardButton(text=f"{test_title}",
+                                                             url=test_url)
+                        inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
+                                                              callback_data="next_lesson_part")
+                        inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
+
+                        # Обновляем индекс видео для следующего раза
+                        next_video_index = current_video_index + 1
+                        await update_current_video_index(module_number, lesson_number, next_video_index)
+                        await update_current_test_index(module_number, lesson_number, next_video_index)
+
+                        # Отправляем видео с кнопкой
+                        await message.answer_video(
+                            video=first_video_id,
+                            caption=f'{lesson_data.get("title")}\n \n {video_to_send["title"]}',
+                            reply_markup=inline_keyboard
+                        )
         else:
             if module_number == current_module:
                 number = 0
