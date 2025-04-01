@@ -37,7 +37,7 @@ def payment_callback(request):
 		processing_date = datetime.fromtimestamp(processing_timestamp) if processing_timestamp else None
 
 		if data["transactionStatus"] == 'Approved':
-			pm = Payment.objects.filter(orderReference=data["orderReference"]).first()
+			pm = Payment.objects.filter(order_reference=data["orderReference"]).first()
 			if pm is None:
 				mapped_data = {
 					"merchant_account": data.get("merchantAccount", ""),

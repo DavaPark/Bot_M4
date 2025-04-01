@@ -43,6 +43,45 @@ async def cmd_start(message: Message):
     await AsyncDB.update_user(message.chat.id, last_date=datetime.now().date())
     existing_user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
     user = await AsyncDB.get_user(message.chat.id)
+    tel_id = message.chat.id
+    payment_number = await AsyncDB.get_user_payments(tel_id)
+    wfp = WayForPay(key=W4P_KEY, domain_name=DOMAIN_NAME)
+    res = wfp.create_invoice(
+        merchantAccount=MERCHANT_ACCOUNT,
+        merchantAuthType='SimpleSignature',
+        amount=f'{AMOUNT}',
+        currency='UAH',
+        productNames=["Оплата за курс M4"],
+        productPrices=[AMOUNT],
+        productCounts=[1],
+        orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 1}"
+    )
+    if res.reason == 'Duplicate Order ID':
+        res = wfp.create_invoice(
+            merchantAccount=MERCHANT_ACCOUNT,
+            merchantAuthType='SimpleSignature',
+            amount=f'{AMOUNT}',
+            currency='UAH',
+            productNames=["Оплата за курс M4"],
+            productPrices=[AMOUNT],
+            productCounts=[1],
+            orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 2}"
+        )
+        if res.reason == 'Duplicate Order ID':
+            res = wfp.create_invoice(
+                merchantAccount=MERCHANT_ACCOUNT,
+                merchantAuthType='SimpleSignature',
+                amount=f'{AMOUNT}',
+                currency='UAH',
+                productNames=["Оплата за курс M4"],
+                productPrices=[AMOUNT],
+                productCounts=[1],
+                orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 6}"
+            )
+    link = res.invoiceUrl
+    if link is not None:
+        await bot.send_message(tel_id, pay_text, reply_markup=sm.pay_keyb(link))
+        return
     if existing_user:
         video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
         await message.answer_video(video_id,
@@ -665,8 +704,17 @@ async def front_of_menu(callback: CallbackQuery):
                 await handle_next_button(callback.message)  # переход дальше
         else:
             user = await AsyncDB.get_user(tel_id)
+            lesson_data = await get_lesson_data_json(module_number, lesson_number)
+            test_data = lesson_data.get("tests", [])
+            test_url = test_data[current_video_index]["url"]
+            test_title = test_data[curent_test_index]["test_id"]
+            inline_button = InlineKeyboardButton(text=f"{test_title}",
+                                                 url=test_url)
+            inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
+                                                  callback_data="next_lesson_part")
+            inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
             text = test_not_passed.replace('%s', user.email)
-            await bot.send_message(tel_id, text=text)
+            await bot.send_message(tel_id, text=text, reply_markup=inline_keyboard)
             return
 
 
