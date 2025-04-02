@@ -43,45 +43,6 @@ async def cmd_start(message: Message):
     await AsyncDB.update_user(message.chat.id, last_date=datetime.now().date())
     existing_user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
     user = await AsyncDB.get_user(message.chat.id)
-    tel_id = message.chat.id
-    payment_number = await AsyncDB.get_user_payments(tel_id)
-    wfp = WayForPay(key=W4P_KEY, domain_name=DOMAIN_NAME)
-    res = wfp.create_invoice(
-        merchantAccount=MERCHANT_ACCOUNT,
-        merchantAuthType='SimpleSignature',
-        amount=f'{AMOUNT}',
-        currency='UAH',
-        productNames=["Оплата за курс M4"],
-        productPrices=[AMOUNT],
-        productCounts=[1],
-        orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 1}"
-    )
-    if res.reason == 'Duplicate Order ID':
-        res = wfp.create_invoice(
-            merchantAccount=MERCHANT_ACCOUNT,
-            merchantAuthType='SimpleSignature',
-            amount=f'{AMOUNT}',
-            currency='UAH',
-            productNames=["Оплата за курс M4"],
-            productPrices=[AMOUNT],
-            productCounts=[1],
-            orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 2}"
-        )
-        if res.reason == 'Duplicate Order ID':
-            res = wfp.create_invoice(
-                merchantAccount=MERCHANT_ACCOUNT,
-                merchantAuthType='SimpleSignature',
-                amount=f'{AMOUNT}',
-                currency='UAH',
-                productNames=["Оплата за курс M4"],
-                productPrices=[AMOUNT],
-                productCounts=[1],
-                orderID=f"M4-{tel_id}-{0 if payment_number is None else payment_number + 6}"
-            )
-    link = res.invoiceUrl
-    if link is not None:
-        await bot.send_message(tel_id, pay_text, reply_markup=sm.pay_keyb(link))
-        return
     if existing_user:
         video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
         await message.answer_video(video_id,
@@ -173,7 +134,7 @@ async def register(callback: CallbackQuery):
                                                 ' спецпропозиція – <b>500 грн</b>. Ми встановили мінімальну оплату, '
                                                 'щоб долучалися лише ті, хто серйозно налаштований навчатися й'
                                                 ' застосовувати знання на практиці.'
-                                                '✅ \n<b>Перед стартом прийми умови</b> – це гарантія якісного'
+                                                '\n✅ <b>Перед стартом прийми умови</b> – це гарантія якісного'
                                                 ' навчання.\n'
                                                 '\n<b>Як приєднатися?</b>\n'
                                                 '\n1️⃣ <b>Прочитай умови</b> – натисни "Прочитати умови".\n'
@@ -440,7 +401,7 @@ async def people(message: Message):
 async def people(message: Message):
     inline_button = [
         [
-            InlineKeyboardButton(text=f"Спільнота", url="https://t.me/+oaL0u9KoXnVmNjhi")
+            InlineKeyboardButton(text=f"Спільнота", url="https://t.me/+jHR9xirMMaMzMDBi")
         ]
     ]
     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=inline_button)
@@ -534,7 +495,7 @@ async def handle_module(message: Message):
                     return
 
                 keyboard = get_lesson_keyboard(getattr(user, "current_lesson", 1))
-                await message.answer("Выберите урок:", reply_markup=keyboard)
+                await message.answer("Оберіть урок:", reply_markup=keyboard)
             else:
                 await message.answer("Пользователь не найден в базе данных.")
         else:
@@ -550,7 +511,7 @@ async def handle_module(message: Message):
                     return
 
                 keyboard = get_lesson_keyboard(6)
-                await message.answer("Выберите урок:", reply_markup=keyboard)
+                await message.answer("Оберіть урок:", reply_markup=keyboard)
 
 
 # Обработчик для кнопки "Урок"
@@ -692,7 +653,7 @@ async def front_of_menu(callback: CallbackQuery):
             if int(test_result) < 80:
                 lesson_data = await get_lesson_data_json(module_number, lesson_number)
                 test_data = lesson_data.get("tests", [])
-                test_url = test_data[current_video_index]["url"]
+                test_url = test_data[current_video_index - 1]["url"]
                 test_title = test_data[curent_test_index]["test_id"]
                 inline_button = InlineKeyboardButton(text=f"{test_title}",
                                                      url=test_url)
@@ -706,7 +667,7 @@ async def front_of_menu(callback: CallbackQuery):
             user = await AsyncDB.get_user(tel_id)
             lesson_data = await get_lesson_data_json(module_number, lesson_number)
             test_data = lesson_data.get("tests", [])
-            test_url = test_data[current_video_index]["url"]
+            test_url = test_data[current_video_index - 1]["url"]
             test_title = test_data[curent_test_index]["test_id"]
             inline_button = InlineKeyboardButton(text=f"{test_title}",
                                                  url=test_url)
