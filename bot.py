@@ -446,12 +446,12 @@ async def people(message: Message):
 async def study(message: Message):
     user = await AsyncDB.get_user(message.chat.id)
 
-    # === ДОБАВЛЕНО ДЛЯ АДМИНА ===
+    # ДЛЯ АДМИНА
     if user and user.is_admin:
         keyboard = sm.get_module_keyboard(6)  # Все уроки открыты
         await message.answer("Оберіть модуль (адміністратор):", reply_markup=keyboard)
         return
-    # === КОНЕЦ ДОБАВЛЕНИЯ ===
+
 
     if not user:
         await message.answer("Вы не зарегистрированы.")
@@ -474,13 +474,12 @@ async def handle_module(message: Message):
     if await check_user(message.chat.id):
         module_number = int(message.text.split(" ")[1])  #Получаем номер модуля
 
-        # === ДОБАВЛЕНО ДЛЯ АДМИНА ===
+        # ДЛЯ АДМИНА
         user = await AsyncDB.get_user(tel_id)
         if user and user.is_admin:
             keyboard = get_lesson_keyboard(6)  # Все уроки открыты
             await message.answer("Оберіть урок (адміністратор):", reply_markup=keyboard)
             return
-        # === КОНЕЦ ДОБАВЛЕНИЯ ===
 
         await AsyncDB.update_user_progress_module(tel_id, module_number)
 
@@ -541,7 +540,7 @@ async def handle_lesson(message: Message):
 
         user = await AsyncDB.get_user(tel_id)
 
-        # === ДОБАВЛЕНО ДЛЯ АДМИНА ===
+        # ДЛЯ АДМИНА
         if user and user.is_admin:
             lesson_data = await get_lesson_data_json(module_number, lesson_number)
             if lesson_data:
@@ -552,13 +551,11 @@ async def handle_lesson(message: Message):
                 await message.answer("Ось усі відео з цього уроку.",
                                      reply_markup=sm.lesson_6_back_buttons_keyboard)
                 return
-        # === КОНЕЦ ДОБАВЛЕНИЯ ===
 
         await update_current_video_index_0(module_number, lesson_number)
         await update_current_test_index_0(module_number, lesson_number)
         current_video_index = await get_current_video_index(module_number, lesson_number)  # Получаем текущий индекс видео
         curent_test_index = await get_current_test_index(module_number, lesson_number)
-
 
         test_scores = await AsyncDB.get_all_test_scores(tel_id, current_module, current_lesson)
         print(test_scores)  # Например: [None, 85, 90]  (первый тест не пройден)
