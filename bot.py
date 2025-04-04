@@ -682,7 +682,7 @@ async def front_of_menu(callback: CallbackQuery):
                 lesson_data = await get_lesson_data_json(module_number, lesson_number)
                 test_data = lesson_data.get("tests", [])
                 test_url = test_data[current_video_index - 1]["url"]
-                test_title = test_data[curent_test_index]["test_id"]
+                test_title = test_data[curent_test_index - 1]["test_id"]
                 inline_button = InlineKeyboardButton(text=f"{test_title}",
                                                      url=test_url)
                 inline_button2 = InlineKeyboardButton(text=f"Далі ➡️",
