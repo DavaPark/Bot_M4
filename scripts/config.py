@@ -11,7 +11,7 @@ DB_CONFIG = {
 W4P_KEY = '3cca33034c5f84c5705d4ebbbd895cbb8377c9b5'
 MERCHANT_ACCOUNT = 'm4europe_org1'
 DOMAIN_NAME = 'https://m4ready.org/ukraine/'
-AMOUNT = 1
+AMOUNT = 500
 
 MODULES_TEMPLATE = {
     "MODULE_1": {
