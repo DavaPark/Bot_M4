@@ -171,8 +171,19 @@ class AsyncDB:
         async with (await AsyncDB.get_connection()) as conn:
             async with conn.cursor() as cursor:
                 await cursor.execute(
-                    "UPDATE users SET current_module = %s, module_start_date = NOW() WHERE tel_id = %s",
+                    "UPDATE users SET current_module = %s WHERE tel_id = %s",
                     (new_module, telegram_id)
+                )
+                await conn.commit()
+
+    @staticmethod
+    async def update_module_start_date(telegram_id: int):
+        from datetime import date
+        async with (await AsyncDB.get_connection()) as conn:
+            async with conn.cursor() as cursor:
+                await cursor.execute(
+                    "UPDATE users SET module_start_date = %s WHERE tel_id = %s",
+                    (date.today(), telegram_id)
                 )
                 await conn.commit()
 
@@ -598,59 +609,6 @@ async def get_videos_by_module_lesson(module_id: int, lesson_id: int):
 # Качаем видосыыыыыыыыыыыыыыыыыыыы
 
 
-# # Обработчик для кнопки "Урок"
-# @dp.message(lambda message: message.text.startswith('Урок'))
-# async def handle_lesson(message: Message):
-#     lesson_number = int(message.text.split(" ")[1])  # Получаем номер урока
-#     tel_id = message.from_user.id
-#     module_number = await AsyncDB.get_user_progress_current_module(tel_id)
-#     current_module = await AsyncDB.get_user_current_module(tel_id)
-#     current_lesson = await AsyncDB.get_current_lesson(tel_id)
-#
-#     if module_number == current_module and lesson_number == current_lesson:
-#         await update_current_video_index_0(lesson_number, module_number)
-#
-#         await AsyncDB.update_user_progress_lesson(tel_id, lesson_number)
-#
-#         lesson_data = await get_lesson_data_json(module_number, lesson_number)
-#
-#         if lesson_data:
-#             first_video = lesson_data["video"][0].get("video_1")  # Первая ссылка на видео
-#             first_test_link = lesson_data["test_links"][0].get("test_1")  # Первая ссылка на тест
-#
-#             # Создаем инлайн кнопку для теста
-#             test_button = InlineKeyboardButton(text="Пройти тест", url=first_test_link)
-#
-#             # Создаем инлайн клавиатуру
-#             lesson_keyboard = InlineKeyboardMarkup(inline_keyboard=[[test_button]])
-#
-#             # Создаем реплай-кнопку для продолжения
-#             next_button = KeyboardButton(text="Далі")
-#             lesson_keyboard_reply = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[next_button]])
-#
-#             # Отправляем сообщение с видео и кнопкой
-#             await message.answer(
-#                 f"Ваше видео для {lesson_data['title']}:\n{first_video}",
-#                 reply_markup=lesson_keyboard
-#             )
-#
-#             if not lesson_data:
-#                 await message.answer("Урок не найден в базе данных.")
-#                 return
-#
-#             # Получаем индекс текущего видео
-#             video_index = lesson_data['current_video_index']
-#             await update_current_video_index(module_number, lesson_number, video_index + 1)
-#             await update_current_test_index(module_number, lesson_number, video_index + 1)
-#             await message.answer("Для перехода к следующему шагу, нажмите 'Далі'.",
-#                                  reply_markup=lesson_keyboard_reply)  # Здесь реплай-кнопка)
-#         else:
-#             await message.answer("Не удалось найти данные об уроке.")
-#     else:
-#         lesson_data = await get_videos_by_module_lesson(module_number, lesson_number)
-#         await message.answer(f'Вот усі відео {lesson_data}',
-#                              reply_markup=sm.lesson_back_buttons_keyboard)
-
 async def get_lesson_data_json(module_id: int, lesson_id: int):
     """Получает данные об уроке по его ID и модулю из JSON."""
     try:
@@ -687,3 +645,61 @@ async def get_lesson_data_json(module_id: int, lesson_id: int):
     return None
 
 
+async def get_dostup_module_index():
+    """Получает значение 'index' из 'dostup-module' из JSON."""
+    try:
+        async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
+            content = await file.read()
+            data = json.loads(content)
+
+        dostup_modules = data.get("dostup-module")
+        if not dostup_modules or not isinstance(dostup_modules, list):
+            print("Поле 'dostup-module' отсутствует или не список.")
+            return None
+
+        index = dostup_modules[0].get("index")
+        if index is None:
+            print("Поле 'index' не найдено в первом элементе.")
+            return None
+
+        return index
+
+    except FileNotFoundError:
+        print(f"Файл {FILE_PATH} не найден.")
+    except json.JSONDecodeError:
+        print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
+    return None
+
+
+async def increment_dostup_module_index():
+    """Увеличивает значение 'index' на 1 в 'dostup-module' внутри JSON."""
+    try:
+        async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
+            content = await file.read()
+            data = json.loads(content)
+
+        dostup_modules = data.get("dostup-module")
+        if not dostup_modules or not isinstance(dostup_modules, list):
+            print("Поле 'dostup-module' отсутствует или не список.")
+            return False
+
+        # Увеличиваем индекс
+        if "index" in dostup_modules[0]:
+            dostup_modules[0]["index"] += 1
+        else:
+            print("Поле 'index' отсутствует в первом элементе.")
+            return False
+
+        # Сохраняем обратно в файл
+        async with aiofiles.open(FILE_PATH, "w", encoding="utf-8") as file:
+            await file.write(json.dumps(data, ensure_ascii=False, indent=4))
+
+        return True
+
+    except FileNotFoundError:
+        print(f"Файл {FILE_PATH} не найден.")
+    except json.JSONDecodeError:
+        print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
+    except Exception as e:
+        print(f"Ошибка при обновлении index: {e}")
+    return False

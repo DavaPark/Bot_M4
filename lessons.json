@@ -1,4 +1,9 @@
 {
+    "dostup-module": [
+        {
+            "index" : 1
+        }
+    ],
     "lessons": [
         {
             "lesson_id": 1,
