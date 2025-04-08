@@ -12,8 +12,8 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKe
     KeyboardButton, ReplyKeyboardMarkup
 from scripts.config import TOKEN_API, W4P_KEY, DOMAIN_NAME, MERCHANT_ACCOUNT, AMOUNT
 from scripts.db_manager import AsyncDB, block_inactive_users, \
-    get_lesson_data_json, update_current_video_index, update_current_test_index, update_current_video_index_0, \
-    get_current_video_index, update_current_test_index_0, get_current_test_index, get_dostup_module_index, \
+    get_lesson_data_json, update_current_video_index, update_current_test_index, update_current_video_index_1, \
+    get_current_video_index, update_current_test_index_1, get_current_test_index, get_dostup_module_index, \
     increment_dostup_module_index
 from datetime import datetime, date
 from scripts.markup import get_lesson_keyboard
@@ -566,6 +566,8 @@ async def handle_lesson(message: Message):
         module_number = await AsyncDB.get_user_progress_current_module(tel_id)
         current_module = await AsyncDB.get_user_current_module(tel_id)
         current_lesson = await AsyncDB.get_current_lesson(tel_id)
+        # await update_current_test_index_1(module_number, lesson_number)
+        # await update_current_video_index_1(module_number, lesson_number)
 
         user = await AsyncDB.get_user(tel_id)
 

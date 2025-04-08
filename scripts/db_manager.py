@@ -520,7 +520,7 @@ async def update_current_test_index(module_id, lesson_id, new_index):
     return False
 
 
-async def update_current_video_index_0(module_id, lesson_id):
+async def update_current_video_index_1(module_id, lesson_id):
     """Обновляет текущий индекс видео для урока по module_id и lesson_id."""
     try:
         async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
@@ -535,7 +535,7 @@ async def update_current_video_index_0(module_id, lesson_id):
         # Ищем урок по module_id и lesson_id
         for lesson in lessons:
             if lesson['module_id'] == module_id and lesson['lesson_id'] == lesson_id:
-                lesson['current_video_index'] = 0
+                lesson['current_video_index'] = 1
                 # Сохраняем изменения в файл
                 async with aiofiles.open(FILE_PATH, "w", encoding="utf-8") as file:
                     await file.write(json.dumps(data, indent=4, ensure_ascii=False))
@@ -549,7 +549,7 @@ async def update_current_video_index_0(module_id, lesson_id):
     return False
 
 
-async def update_current_test_index_0(module_id, lesson_id):
+async def update_current_test_index_1(module_id, lesson_id):
     """Обновляет текущий индекс видео для урока по module_id и lesson_id."""
     try:
         async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
@@ -564,7 +564,7 @@ async def update_current_test_index_0(module_id, lesson_id):
         # Ищем урок по module_id и lesson_id
         for lesson in lessons:
             if lesson['module_id'] == module_id and lesson['lesson_id'] == lesson_id:
-                lesson['current_test_index'] = 0
+                lesson['current_test_index'] = 1
                 # Сохраняем изменения в файл
                 async with aiofiles.open(FILE_PATH, "w", encoding="utf-8") as file:
                     await file.write(json.dumps(data, indent=4, ensure_ascii=False))

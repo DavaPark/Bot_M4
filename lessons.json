@@ -1,7 +1,7 @@
 {
     "dostup-module": [
         {
-            "index" : 1
+            "index": 1
         }
     ],
     "lessons": [
@@ -45,8 +45,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -89,8 +89,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -125,8 +125,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -189,8 +189,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -225,8 +225,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -289,8 +289,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 0,
-            "current_test_index": 0,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -333,8 +333,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 0,
-            "current_test_index": 0,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -369,8 +369,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -405,8 +405,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 0,
-            "current_test_index": 0,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -469,8 +469,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 0,
-            "current_test_index": 0,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -505,8 +505,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -541,8 +541,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -613,8 +613,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -657,8 +657,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -753,8 +753,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -789,8 +789,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -853,8 +853,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -889,8 +889,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -925,8 +925,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 0,
-            "current_test_index": 0,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -953,8 +953,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -981,8 +981,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -1037,8 +1037,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -1073,8 +1073,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -1117,8 +1117,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -1153,8 +1153,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -1197,8 +1197,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 3,
-            "current_test_index": 3,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -1233,8 +1233,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 2,
-            "current_test_index": 2,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         },
         {
@@ -1305,8 +1305,8 @@
                 }
             ],
             "pass_score": 80,
-            "current_video_index": 0,
-            "current_test_index": 0,
+            "current_video_index": 1,
+            "current_test_index": 1,
             "current_lesson_progress": 0
         }
     ]
