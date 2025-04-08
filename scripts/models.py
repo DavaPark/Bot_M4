@@ -1,6 +1,6 @@
 class User:
     def __init__(self, tel_id, name, email, context, is_blocked, is_admin, create_date, module_start_date,
-                 current_module, current_lesson, last_date, phone, region, denomination, role, username):
+                 current_module, current_lesson, last_date, phone, region, denomination, role, username, open_module):
         self.tel_id = tel_id
         self.name = name
         self.email = email
@@ -17,6 +17,7 @@ class User:
         self.denomination = denomination
         self.role = role
         self.username = username
+        self.open_module = open_module
 
 
 class Archive:

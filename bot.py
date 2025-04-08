@@ -14,7 +14,7 @@ from scripts.config import TOKEN_API, W4P_KEY, DOMAIN_NAME, MERCHANT_ACCOUNT, AM
 from scripts.db_manager import AsyncDB, block_inactive_users, \
     get_lesson_data_json, update_current_video_index, update_current_test_index, update_current_video_index_1, \
     get_current_video_index, update_current_test_index_1, get_current_test_index, get_dostup_module_index, \
-    increment_dostup_module_index
+    update_dostup_module_index
 from datetime import datetime, date
 from scripts.markup import get_lesson_keyboard
 
@@ -482,10 +482,9 @@ async def handle_module(message: Message):
             await message.answer("Оберіть урок (адміністратор):", reply_markup=keyboard)
             return
 
-        current_module = await AsyncDB.get_user_current_module(tel_id)
-        dostup_module = await get_dostup_module_index()
+        dostup_module = await get_dostup_module_index(tel_id)
 
-        if current_module != dostup_module:
+        if module_number > dostup_module:
             module_start_date = await AsyncDB.get_module_start_date(message.chat.id)
 
             if not user:
@@ -877,8 +876,8 @@ async def check_modules():
 
     for user in users:
         module_start_date = user.get("module_start_date")
-        dostup_module = await get_dostup_module_index()
-
+        dostup_module = await get_dostup_module_index(user["tel_id"])
+        new_module = dostup_module + 1
         if not module_start_date:
             continue  # Пропускаем, если у пользователя нет даты старта
 
@@ -887,7 +886,7 @@ async def check_modules():
 
         if days_passed >= 15:
             await AsyncDB.update_current_lesson(user["tel_id"], 1)
-            await increment_dostup_module_index()
+            await update_dostup_module_index(user["tel_id"], new_module)
             await AsyncDB.update_module_start_date(user["tel_id"])
 
 

@@ -645,61 +645,21 @@ async def get_lesson_data_json(module_id: int, lesson_id: int):
     return None
 
 
-async def get_dostup_module_index():
-    """Получает значение 'index' из 'dostup-module' из JSON."""
-    try:
-        async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
-            content = await file.read()
-            data = json.loads(content)
-
-        dostup_modules = data.get("dostup-module")
-        if not dostup_modules or not isinstance(dostup_modules, list):
-            print("Поле 'dostup-module' отсутствует или не список.")
-            return None
-
-        index = dostup_modules[0].get("index")
-        if index is None:
-            print("Поле 'index' не найдено в первом элементе.")
-            return None
-
-        return index
-
-    except FileNotFoundError:
-        print(f"Файл {FILE_PATH} не найден.")
-    except json.JSONDecodeError:
-        print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
-    return None
+async def get_dostup_module_index(telegram_id: int):
+    """Получает значение 'open_module' """
+    async with (await AsyncDB.get_connection()) as conn:
+        async with conn.cursor(aiomysql.DictCursor) as cursor:
+            await cursor.execute("SELECT open_module FROM users WHERE tel_id = %s", (telegram_id,))
+            result = await cursor.fetchone()
+            return result['open_module'] if result else None
 
 
-async def increment_dostup_module_index():
-    """Увеличивает значение 'index' на 1 в 'dostup-module' внутри JSON."""
-    try:
-        async with aiofiles.open(FILE_PATH, "r", encoding="utf-8") as file:
-            content = await file.read()
-            data = json.loads(content)
-
-        dostup_modules = data.get("dostup-module")
-        if not dostup_modules or not isinstance(dostup_modules, list):
-            print("Поле 'dostup-module' отсутствует или не список.")
-            return False
-
-        # Увеличиваем индекс
-        if "index" in dostup_modules[0]:
-            dostup_modules[0]["index"] += 1
-        else:
-            print("Поле 'index' отсутствует в первом элементе.")
-            return False
-
-        # Сохраняем обратно в файл
-        async with aiofiles.open(FILE_PATH, "w", encoding="utf-8") as file:
-            await file.write(json.dumps(data, ensure_ascii=False, indent=4))
-
-        return True
-
-    except FileNotFoundError:
-        print(f"Файл {FILE_PATH} не найден.")
-    except json.JSONDecodeError:
-        print(f"Ошибка парсинга JSON в файле {FILE_PATH}.")
-    except Exception as e:
-        print(f"Ошибка при обновлении index: {e}")
-    return False
+async def update_dostup_module_index(telegram_id: int, new_module: int ):
+    """Увеличивает значение в 'open_module'."""
+    async with (await AsyncDB.get_connection()) as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                "UPDATE users SET open_module = %s WHERE tel_id = %s",
+                (new_module, telegram_id)
+            )
+            await conn.commit()
