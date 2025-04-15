@@ -854,7 +854,8 @@ async def next_module(message: Message):
                                      reply_markup=keyboard)
                 return
             else:
-                await message.answer("ger")
+                await message.answer("Наступний модуль не відкрито",
+                                     reply_markup=sm.main_menu(user.is_admin))
 
 
 # @dp.message(F.text == "ADMIN")
