@@ -613,6 +613,7 @@ async def handle_lesson(message: Message):
                     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
 
                     await message.answer_video(video=video_id, caption=caption, reply_markup=inline_keyboard)
+                    return
                 else:
                     back_markup = sm.lesson_back_buttons_keyboard if lesson_number != 6 else sm.lesson_6_back_buttons_keyboard
                     await message.answer("Ось усі відео з цього уроку.", reply_markup=back_markup)
@@ -872,6 +873,7 @@ async def check_modules():
 
     for user in users:
         module_start_date = user.get("module_start_date")
+        current_module = user.get("current_module")
         dostup_module = await get_dostup_module_index(user["tel_id"])
         new_module = dostup_module + 1
         if not module_start_date:
@@ -880,7 +882,7 @@ async def check_modules():
         module_start_date = module_start_date.date() if isinstance(module_start_date, datetime) else module_start_date
         days_passed = (datetime.now().date() - module_start_date).days
 
-        if days_passed >= 15:
+        if days_passed >= 15 and current_module > dostup_module:
             await AsyncDB.update_current_lesson(user["tel_id"], 1)
             await update_dostup_module_index(user["tel_id"], new_module)
             await AsyncDB.update_module_start_date(user["tel_id"])
