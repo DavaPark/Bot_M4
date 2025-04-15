@@ -233,6 +233,29 @@ class AsyncDB:
     #     ///////////////////////////////////////////////////////////////////////
 
     @staticmethod
+    async def get_current_video_index(tel_id: int, module_number: int, lesson_number: int) -> int:
+        user_progress = await AsyncDB.get_user_progress(tel_id)
+        if not user_progress or not user_progress.progress:
+            return 0  # старт с первого видео
+
+        try:
+            progress_data = json.loads(user_progress.progress)
+            lesson_progress = progress_data.get(f"module{module_number}", {}).get(f"lesson{lesson_number}", {})
+
+            keys = sorted(lesson_progress.keys(), key=lambda x: int(x))  # сортировка по номеру видео
+
+            for i, key in enumerate(keys):
+                score = lesson_progress.get(key)
+                if score is None or int(score) < 80:
+                    return i  # вернём индекс первого непройденного видео
+
+            return len(keys)  # если все прошли успешно — возвращаем длину (все пройдены)
+
+        except Exception as e:
+            print(f"[ERROR] get_current_video_index: {e}")
+            return 0
+
+    @staticmethod
     async def create_user_progress(telegram_id: int):
         async with (await AsyncDB.get_connection()) as conn:
             async with conn.cursor() as cursor:

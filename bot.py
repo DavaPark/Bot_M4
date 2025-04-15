@@ -45,7 +45,7 @@ async def cmd_start(message: Message):
     existing_user = await AsyncDB.get_user_by_telegram_id(message.chat.id)
     user = await AsyncDB.get_user(message.chat.id)
     if existing_user:
-        video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
+        video_id = "BAACAgIAAxkBAAMPZ_4Ps87vEG8mEXzRwtQ2bbJ08HUAAhFjAALA6vBL0sd6YDDWayA2BA"
         await message.answer_video(video_id,
                                    caption="🎉 <b>Вітаємо на навчанні!</b>\n"
                                            "\nТи зробив важливий крок, і ми раді вітати тебе у цій подорожі! "
@@ -61,7 +61,7 @@ async def cmd_start(message: Message):
                                    reply_markup=sm.main_menu(user.is_admin))
     else:
 
-        video_id = "BAACAgIAAxkBAAIGxGfRd09oFFHdKjc5l7m9VhCbdXLiAAKxbAACX0WISu39lxhxZ-NBNgQ"
+        video_id = "BAACAgIAAxkBAAMHZ_4NV3G2jd1j467XUGOBjH32jP4AAgNjAALA6vBL7VJJ5eTLNM42BA"
         await message.answer_video(video_id,
                                    caption="👋 Привіт! <b>Раді, що ти тут!</b> Якщо ти дивишся це відео, значить, "
                                            "прагнеш зрозуміти свій поклик. І це чудово! 🎯\n"
@@ -81,9 +81,9 @@ async def cmd_start(message: Message):
 async def program(callback: CallbackQuery):
     await callback.answer()
     await callback.message.answer_photo(
-        photo='AgACAgIAAxkBAANaZ8BbkqdO-1QYenBcyDJ3RqdnzrwAAkDmMRtApwABSsqe1imkYgvmAQADAgADeQADNgQ')
+        photo="AgACAgIAAxkBAAMZZ_4ffRb-4wwwN5PZxv8pPmvQ6w8AAvHnMRvA6vBLsvQsDJcXcN8BAAMCAAN5AAM2BA")
 
-    video_id = "BAACAgIAAxkBAAIG72fRfmj_94U39Gi4oJ5vXuPJg1NOAAISbQACX0WISmTvL-AFOLPuNgQ"
+    video_id = "BAACAgIAAxkBAAMLZ_4O6rwwWwIQb7nR5hgedfXVyswAAgxjAALA6vBLY45jfA26hWM2BA"
     await callback.message.answer_video(video_id)
 
     await callback.message.answer(program_text,
@@ -93,7 +93,7 @@ async def program(callback: CallbackQuery):
 @dp.callback_query(F.data == 'program_go_back')
 async def program_go_back(callback: CallbackQuery):
     await callback.answer()
-    video_id = "BAACAgIAAxkBAAIGxGfRd09oFFHdKjc5l7m9VhCbdXLiAAKxbAACX0WISu39lxhxZ-NBNgQ"
+    video_id = "BAACAgIAAxkBAAMHZ_4NV3G2jd1j467XUGOBjH32jP4AAgNjAALA6vBL7VJJ5eTLNM42BA"
     await callback.message.answer_video(video_id,
                                         caption="👋 Привіт! <b>Раді, що ти тут!</b> Якщо ти дивишся це відео, "
                                                 "значить, прагнеш"
@@ -114,9 +114,9 @@ async def program_go_back(callback: CallbackQuery):
 async def why_need(callback: CallbackQuery):
     await callback.answer()
     await callback.message.answer_photo(
-        photo='AgACAgIAAxkBAAOjZ8BmyzugXiu1u03VDUA7QorTKtgAApjpMRtXDAhKvNirwneIGxUBAAMCAAN5AAM2BA')
+        photo='AgACAgIAAxkBAAMbZ_4gX8-3E7yQuEhMw_oe5TgoFQIAAvTnMRvA6vBLweglqVmEeB8BAAMCAAN5AAM2BA')
 
-    video_id = 'BAACAgIAAxkBAAIGzWfReJSb15707jqgSoBCl1DA_-XEAALBbAACX0WISh4jsP2wXSPrNgQ'
+    video_id = 'BAACAgIAAxkBAAMNZ_4PMicufFlEHjlzJBwr5mq0qLIAAg1jAALA6vBL8V68THZ-K6M2BA'
     await callback.message.answer_video(video_id)
 
     await callback.message.answer(why_need_text,
@@ -126,7 +126,7 @@ async def why_need(callback: CallbackQuery):
 @dp.callback_query(F.data == 'register')
 async def register(callback: CallbackQuery):
     await callback.answer()
-    video_id = 'BAACAgIAAxkBAAIHAWfRf63YsHvi-K8GitQhop6uRUrRAAIjbQACX0WISrWlyf_PeDBZNgQ'
+    video_id = 'BAACAgIAAxkBAAMJZ_4OATNtScGjDGNekhizgk3Q630AAghjAALA6vBLmmkJXgv6M402BA'
     await callback.message.answer_video(video_id,
                                         caption='🎉 Ти на крок ближче до змін! Зараз важливо визначитися: чи готовий'
                                                 ' ти інвестувати час у своє покликання?\n'
@@ -149,7 +149,7 @@ async def register(callback: CallbackQuery):
 @dp.callback_query(F.data == 'go_back_register')
 async def go_back_register(callback: CallbackQuery):
     await callback.answer()
-    video_id = 'BAACAgIAAxkBAAIHAWfRf63YsHvi-K8GitQhop6uRUrRAAIjbQACX0WISrWlyf_PeDBZNgQ'
+    video_id = 'BAACAgIAAxkBAAMJZ_4OATNtScGjDGNekhizgk3Q630AAghjAALA6vBLmmkJXgv6M402BA'
     await callback.message.answer_video(video_id,
                                         caption='🎉 Ти на крок ближче до змін! Зараз важливо визначитися: чи готовий'
                                                 ' ти інвестувати час у своє покликання?\n'
@@ -276,7 +276,7 @@ async def go_back_form(callback: CallbackQuery):
 async def front_of_menu(callback: CallbackQuery):
 
     # при успешной оплате
-    video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
+    video_id = 'BAACAgIAAxkBAAMPZ_4Ps87vEG8mEXzRwtQ2bbJ08HUAAhFjAALA6vBL0sd6YDDWayA2BA'
     await callback.answer()
     user = await AsyncDB.get_user(callback.message.chat.id)
     await callback.message.answer_video(video_id,
@@ -626,8 +626,8 @@ async def front_of_menu(callback: CallbackQuery):
         up = dict(json.loads(_up_.progress))
         module_number = _up_.select_module
         lesson_number = _up_.select_lesson
-        current_video_index = await get_current_video_index(module_number, lesson_number)
-        curent_test_index = await get_current_test_index(module_number, lesson_number)
+        current_video_index = await AsyncDB.get_current_video_index(tel_id, module_number, lesson_number)
+        curent_test_index = await AsyncDB.get_current_video_index(tel_id, module_number, lesson_number)
         test_result = up[f"module{module_number}"][f"lesson{lesson_number}"].get(str(current_video_index))
         if test_result is not None:
             if int(test_result) < 80:
@@ -660,8 +660,8 @@ async def handle_next_button(message: Message):
         module_number = await AsyncDB.get_user_progress_current_module(tel_id)
         lesson_number = await AsyncDB.get_user_progress_current_lesson(tel_id)
         lesson_data = await get_lesson_data_json(module_number, lesson_number)
-        current_video_index = await get_current_video_index(module_number, lesson_number)
-        curent_test_index = await get_current_test_index(module_number, lesson_number)
+        current_video_index = await AsyncDB.get_current_video_index(tel_id, module_number, lesson_number)
+        curent_test_index = await AsyncDB.get_current_video_index(tel_id, module_number, lesson_number)
 
         if lesson_data:
             if current_video_index < len(lesson_data['video']):
@@ -676,10 +676,6 @@ async def handle_next_button(message: Message):
                         inline_button = InlineKeyboardButton(text=f"{test_title}", url=test_url)
                         inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data="next_lesson_part")
                         inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
-
-                        next_video_index = current_video_index + 1
-                        await update_current_video_index(module_number, lesson_number, next_video_index)
-                        await update_current_test_index(module_number, lesson_number, next_video_index)
 
                         await message.answer_video(
                             video=first_video_id,
@@ -778,7 +774,7 @@ async def back_to_lessons(message: Message):
 
 @dp.message(F.text == "Головне меню")
 async def back_to_lessons(message: Message):
-    video_id = 'BAACAgIAAxkBAAIGomfRWLc0u1m1cDUngcSI2BFFGhCaAALYagACX0WISsgyvOR_ge0ONgQ'
+    video_id = 'BAACAgIAAxkBAAMPZ_4Ps87vEG8mEXzRwtQ2bbJ08HUAAhFjAALA6vBL0sd6YDDWayA2BA'
     user = await AsyncDB.get_user(message.chat.id)
     await message.answer_video(video_id,
                                caption="🎉 <b>Вітаємо на навчанні!</b>\n"
@@ -814,7 +810,7 @@ async def next_module(message: Message):
             current_module = await AsyncDB.get_user_current_module(tel_id)
             new_module = current_module + 1
             await AsyncDB.update_current_module(tel_id, new_module)
-            video_id = "BAACAgIAAxkBAAIKr2fbLs92cFT61alfPcdV9KLzlNjVAAKtagAC7vzhSpe4NvrqYX35NgQ"
+            video_id = "BAACAgIAAxkBAAPQZ_47oZIPI2-ZcSdzZsiKRfGCkmEAApxlAALA6vBL3qsoDDIa3k02BA"
             await message.answer_video(video_id,
                                        caption="<b>Вітаємо!</b> 🎉 "
                                                "\n\nТи пройшов важливий шлях, отримав нові знання та навички, розкрив своє"
