@@ -565,8 +565,6 @@ async def handle_lesson(message: Message):
         module_number = await AsyncDB.get_user_progress_current_module(tel_id)
         current_module = await AsyncDB.get_user_current_module(tel_id)
         current_lesson = await AsyncDB.get_current_lesson(tel_id)
-        # await update_current_test_index_1(module_number, lesson_number)
-        # await update_current_video_index_1(module_number, lesson_number)
 
         user = await AsyncDB.get_user(tel_id)
 
