@@ -72,7 +72,7 @@ def payment_callback(request):
 				}
 				payment = Payment.update_or_create_from_request(mapped_data)
 				if payment:
-					bot = Bot("7581915348:AAHUlNsTShmtD6tzRpVX_1dJwTz9RF4rC64",
+					bot = Bot("8115760706:AAGRVfBM8uUuQr384luMII3mG-i_jFQIBZ0",
 					          default=DefaultBotProperties(parse_mode="HTML"))
 					video_id = 'BAACAgIAAxkBAAPFZ8Bu8ajHtoaignWxQ97udddTYCwAAq5hAAJXDAhKFdXY_cFCbyE2BA'
 					menu_buttons_keyboard = ReplyKeyboardMarkup(
