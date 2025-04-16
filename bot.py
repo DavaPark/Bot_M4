@@ -609,7 +609,7 @@ async def handle_lesson(message: Message):
                     test_title = test_data[index]["test_id"]
 
                     inline_button = InlineKeyboardButton(text=f"{test_title}", url=test_url)
-                    inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data='next_lesson_part')
+                    inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data="next_lesson_part")
                     inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
 
                     await message.answer_video(video=video_id, caption=caption, reply_markup=inline_keyboard)
@@ -637,7 +637,7 @@ async def front_of_menu(callback: CallbackQuery):
                 test_url = test_data[current_video_index - 1]["url"]
                 test_title = test_data[curent_test_index - 1]["test_id"]
                 inline_button = InlineKeyboardButton(text=f"{test_title}", url=test_url)
-                inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data='next_lesson_part')
+                inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data="next_lesson_part")
                 inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
                 await bot.send_message(tel_id, failed_test, reply_markup=inline_keyboard)
             else:
@@ -649,7 +649,7 @@ async def front_of_menu(callback: CallbackQuery):
             test_url = test_data[current_video_index - 1]["url"]
             test_title = test_data[curent_test_index]["test_id"]
             inline_button = InlineKeyboardButton(text=f"{test_title}", url=test_url)
-            inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data='next_lesson_part')
+            inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data="next_lesson_part")
             inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
             text = test_not_passed.replace('%s', user.email)
             await bot.send_message(tel_id, text=text, reply_markup=inline_keyboard)
