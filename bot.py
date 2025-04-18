@@ -596,6 +596,11 @@ async def handle_lesson(message: Message):
             video_id = video_to_send.get("video_id")
             caption = f"{lesson_data.get('title')}\n\nВідео {index + 1}/{len(lesson_data['video'])}\n\n{video_to_send['title']}"
 
+            print(index)
+            await AsyncDB.update_current_index_user_progress(tel_id, index + 1)
+            current_index = await AsyncDB.get_current_index_user_progress(tel_id)
+            print(current_index)
+            print(index)
             if index < len(passed_tests):
                 # Видео уже просмотрено и тест сдан — просто показать видео и текст
                 await message.answer_video(video=video_id, caption=caption)
@@ -625,27 +630,31 @@ async def front_of_menu(callback: CallbackQuery):
         up = dict(json.loads(_up_.progress))
         module_number = _up_.select_module
         lesson_number = _up_.select_lesson
-        current_video_index = await AsyncDB.get_current_video_index(tel_id, module_number, lesson_number)
-        curent_test_index = await AsyncDB.get_current_video_index(tel_id, module_number, lesson_number)
-        test_result = up[f"module{module_number}"][f"lesson{lesson_number}"].get(str(current_video_index))
+        current_index = await AsyncDB.get_current_index_user_progress(tel_id)
+
+        print(current_index)
+
+        test_result = up[f"module{module_number}"][f"lesson{lesson_number}"].get(str(current_index))
+        print(test_result)
         if test_result is not None:
             if int(test_result) < 80:
                 lesson_data = await get_lesson_data_json(module_number, lesson_number)
                 test_data = lesson_data.get("tests", [])
-                test_url = test_data[current_video_index - 1]["url"]
-                test_title = test_data[curent_test_index - 1]["test_id"]
+                test_url = test_data[current_index - 1]["url"]
+                test_title = test_data[current_index - 1]["test_id"]
                 inline_button = InlineKeyboardButton(text=f"{test_title}", url=test_url)
                 inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data="next_lesson_part")
                 inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
                 await bot.send_message(tel_id, failed_test, reply_markup=inline_keyboard)
             else:
+                await AsyncDB.update_current_index_user_progress(tel_id, current_index + 1)
                 await handle_next_button(callback.message)
         else:
             user = await AsyncDB.get_user(tel_id)
             lesson_data = await get_lesson_data_json(module_number, lesson_number)
             test_data = lesson_data.get("tests", [])
-            test_url = test_data[current_video_index - 1]["url"]
-            test_title = test_data[curent_test_index]["test_id"]
+            test_url = test_data[current_index - 1]["url"]
+            test_title = test_data[current_index - 1]["test_id"]
             inline_button = InlineKeyboardButton(text=f"{test_title}", url=test_url)
             inline_button2 = InlineKeyboardButton(text=f"Далі ➡️", callback_data="next_lesson_part")
             inline_keyboard = InlineKeyboardMarkup(inline_keyboard=[[inline_button], [inline_button2]])
@@ -929,6 +938,10 @@ async def main():
     schedule.every().day.at("04:19").do(daily_texts_sync)
 
     asyncio.create_task(scheduler())
+
+    # Удаляем webhook, чтобы избежать конфликта
+    await bot.delete_webhook(drop_pending_updates=True)
+
     await dp.start_polling(bot)
 
 if __name__ == '__main__':

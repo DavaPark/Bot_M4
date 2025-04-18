@@ -233,6 +233,25 @@ class AsyncDB:
     #     ///////////////////////////////////////////////////////////////////////
 
     @staticmethod
+    async def get_current_index_user_progress(tel_id: int) -> int:
+        conn = await AsyncDB.get_connection()
+        async with conn.cursor() as cursor:
+            await cursor.execute("SELECT current_index FROM user_progress WHERE tel_id = %s", (tel_id,))
+            result = await cursor.fetchone()
+
+        await conn.ensure_closed()
+        return result[0] if result else 0
+
+    @staticmethod
+    async def update_current_index_user_progress(tel_id: int, new_index: int):
+        conn = await AsyncDB.get_connection()
+        async with conn.cursor() as cursor:
+            await cursor.execute("UPDATE user_progress SET current_index = %s WHERE tel_id = %s", (new_index, tel_id))
+            await conn.commit()
+
+        await conn.ensure_closed()
+
+    @staticmethod
     async def get_current_video_index(tel_id: int, module_number: int, lesson_number: int) -> int:
         user_progress = await AsyncDB.get_user_progress(tel_id)
         if not user_progress or not user_progress.progress:
