@@ -926,6 +926,14 @@ def daily_texts_sync():
     loop.create_task(daily_texts())
 
 
+async def keep_polling_active():
+    await bot.delete_webhook(drop_pending_updates=False)
+
+
+def keep_polling_active_sync():
+    asyncio.create_task(keep_polling_active())
+
+
 async def scheduler():
     while True:
         schedule.run_pending()
@@ -933,13 +941,14 @@ async def scheduler():
 
 
 async def main():
+    schedule.every(1).minutes.do(keep_polling_active_sync)
     schedule.every().day.at("03:59").do(block_inactive_users_sync)
     schedule.every().day.at("04:09").do(check_modules_sync)
     schedule.every().day.at("04:19").do(daily_texts_sync)
 
     asyncio.create_task(scheduler())
 
-    # Удаляем webhook, чтобы избежать конфликта
+    # Удаляем webhook один раз перед стартом polling
     await bot.delete_webhook(drop_pending_updates=True)
 
     await dp.start_polling(bot)
